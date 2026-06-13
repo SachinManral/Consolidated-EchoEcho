@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Generating your track</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── Keyframes ─────────────────────────────────────── */
+    @keyframes pulse-orb {
+      0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(255,88,88,.35), 0 0 0 0 rgba(192,88,255,.25), 0 8px 32px rgba(192,88,255,.25); }
+      50%  { transform: scale(1.12); box-shadow: 0 0 0 18px rgba(255,88,88,.12), 0 0 0 36px rgba(192,88,255,.07), 0 16px 60px rgba(192,88,255,.4); }
+      100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(255,88,88,.35), 0 0 0 0 rgba(192,88,255,.25), 0 8px 32px rgba(192,88,255,.25); }
+    }
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes orbit-rev {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes wave {
+      0%, 100% { height: var(--min-h, 6px); opacity: .35; }
+      50%       { height: var(--max-h, 40px); opacity: .9; }
+    }
+    @keyframes fade-up {
+      0%  { opacity: 0; transform: translateY(22px); }
+      to  { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes step-done {
+      0%   { transform: scale(0); opacity: 0; }
+      60%  { transform: scale(1.25); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes msg-in {
+      0%   { opacity: 0; transform: translateY(12px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes msg-out {
+      0%   { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-10px); }
+    }
+    @keyframes dot-blink {
+      0%,80%,100% { opacity: .2; transform: scale(.8); }
+      40%          { opacity: 1;  transform: scale(1); }
+    }
+
+    /* ── Reset & Base ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #fff;
+      color: #0d0d0d;
+    }
+
+    :root {
+      --dark: #0d0d0d;
+      --white: #fff;
+      --greyF4: #f4f4f4;
+      --greyD9: #d9d9d9;
+      --grey71: #717171;
+      --gradient: linear-gradient(0.351turn, #ff5858 23.71%, #c058ff 78.8%);
+      --gradient-text: linear-gradient(135deg, #ff5858 0%, #c058ff 100%);
+      --shadow-box: 0px 2.5px 6px rgba(0,0,0,.05), 0px 10px 50px rgba(0,0,0,.04), 0px 0px 2.5px rgba(0,0,0,.15);
+      --nav-h: 64px;
+    }
+
+    /* ── Nav ───────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      height: var(--nav-h); background: #fff;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+      display: flex; align-items: center;
+      padding: 0 2rem; gap: 1rem;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: .45rem;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: var(--gradient);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-icon svg { width: 16px; height: 16px; }
+    .nav-wordmark {
+      font-size: 1rem; font-weight: 800; letter-spacing: -.03em; color: var(--dark);
+    }
+    .nav-wordmark em {
+      font-style: normal;
+      background: var(--gradient-text);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-divider { width: 1px; height: 20px; background: rgba(13,13,13,.08); margin: 0 .25rem; }
+    .nav-back {
+      display: flex; align-items: center; gap: .375rem;
+      font-size: .8rem; font-weight: 600; color: var(--grey71);
+      text-decoration: none; transition: color .15s;
+    }
+    .nav-back:hover { color: var(--dark); }
+    .nav-back svg { width: 14px; height: 14px; }
+    .nav-right { margin-left: auto; display: flex; align-items: center; gap: .75rem; }
+    .skip-link {
+      font-size: .8rem; font-weight: 600; color: var(--grey71);
+      text-decoration: none; transition: color .15s;
+      cursor: pointer;
+    }
+    .skip-link:hover { color: var(--dark); }
+
+    /* ── Page Shell ────────────────────────────────────── */
+    .page {
+      min-height: 100vh;
+      padding-top: var(--nav-h);
+      display: flex; align-items: center; justify-content: center;
+      padding-bottom: 3rem;
+    }
+    .container {
+      width: 100%; max-width: 520px;
+      padding: 2.5rem 1.5rem;
+      display: flex; flex-direction: column; align-items: center; gap: 2rem;
+      animation: fade-up .5s cubic-bezier(.2,.75,.28,.9) both .05s;
+    }
+
+    /* ── Inspo Pills Row ───────────────────────────────── */
+    .pills-row {
+      display: flex; flex-wrap: wrap; gap: .5rem;
+      justify-content: center;
+    }
+    .pill {
+      background: var(--greyF4);
+      border-radius: 9999px;
+      padding: .3rem .75rem;
+      font-size: .78rem; font-weight: 600; color: var(--dark);
+      display: flex; align-items: center; gap: .3rem;
+    }
+    .pill-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--gradient); flex-shrink: 0;
+    }
+    .pill span { color: var(--grey71); font-weight: 500; margin-right: .1rem; }
+
+    /* ── Animation Stage ───────────────────────────────── */
+    .stage {
+      width: 360px; height: 320px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Central orb */
+    .orb {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: var(--gradient);
+      animation: pulse-orb 2s ease-in-out infinite;
+      position: relative; z-index: 4;
+      flex-shrink: 0;
+    }
+    /* rotating aurora halo behind the orb */
+    .orb::after {
+      content: ''; position: absolute; inset: -26px;
+      border-radius: 50%; z-index: -1;
+      background: conic-gradient(from 0deg,
+        rgba(255,88,88,0), rgba(255,88,88,.4), rgba(192,88,255,.5),
+        rgba(88,144,255,.35), rgba(255,88,88,0));
+      filter: blur(16px);
+      animation: orbit 4.5s linear infinite;
+    }
+    .stage { transform-style: preserve-3d; transition: transform .15s ease-out; }
+    .stage-wrap { perspective: 900px; }
+    .orb-inner {
+      position: absolute; inset: 14px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(2px);
+    }
+    .orb-icon {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .orb-icon svg { width: 40px; height: 40px; }
+
+    /* Orbit rings + dots */
+    .orbit-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1.5px dashed rgba(192,88,255,.2);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .orbit-ring-1 { width: 188px; height: 188px; }
+    .orbit-ring-2 { width: 260px; height: 260px; }
+    .orbit-ring-3 { width: 320px; height: 320px; }
+
+    .orbit-wrap {
+      position: absolute;
+      top: 50%; left: 50%;
+      margin-top: -6px; margin-left: -6px;
+      border-radius: 50%;
+    }
+    /* Each orbit-wrap has its own size for the radius */
+    .orbit-wrap-1 {
+      width: 188px; height: 188px;
+      margin-top: -94px; margin-left: -94px;
+      animation: orbit 3.2s linear infinite;
+    }
+    .orbit-wrap-2 {
+      width: 260px; height: 260px;
+      margin-top: -130px; margin-left: -130px;
+      animation: orbit 5s linear infinite reverse;
+      animation-delay: -.8s;
+    }
+    .orbit-wrap-3 {
+      width: 260px; height: 260px;
+      margin-top: -130px; margin-left: -130px;
+      animation: orbit 5s linear infinite reverse;
+      animation-delay: -2.5s;
+    }
+    .orbit-wrap-4 {
+      width: 320px; height: 320px;
+      margin-top: -160px; margin-left: -160px;
+      animation: orbit 7s linear infinite;
+      animation-delay: -1.4s;
+    }
+
+    .orbit-dot {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      border-radius: 50%;
+    }
+    .orbit-dot-1 {
+      width: 10px; height: 10px;
+      background: linear-gradient(135deg, #ff5858, #c058ff);
+      box-shadow: 0 0 8px rgba(255,88,88,.6);
+    }
+    .orbit-dot-2 {
+      width: 8px; height: 8px;
+      background: linear-gradient(135deg, #c058ff, #ff5858);
+      box-shadow: 0 0 7px rgba(192,88,255,.7);
+    }
+    .orbit-dot-3 {
+      width: 7px; height: 7px;
+      background: linear-gradient(135deg, #ff5858, #ff9858);
+      box-shadow: 0 0 6px rgba(255,88,88,.5);
+    }
+    .orbit-dot-4 {
+      width: 9px; height: 9px;
+      background: linear-gradient(135deg, #c058ff, #5890ff);
+      box-shadow: 0 0 8px rgba(88,144,255,.6);
+    }
+
+    /* Waveform */
+    .waveform {
+      position: absolute;
+      bottom: 6px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; align-items: flex-end; gap: 3px;
+      height: 56px; width: 300px;
+    }
+    .wave-bar {
+      flex: 1;
+      border-radius: 3px 3px 2px 2px;
+      background: var(--gradient);
+      min-height: 4px;
+      animation: wave var(--dur, .9s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+
+    /* ── Status Block ──────────────────────────────────── */
+    .status-block {
+      display: flex; flex-direction: column; align-items: center; gap: .75rem;
+      text-align: center; width: 100%;
+    }
+    .status-headline-wrap {
+      position: relative; height: 2.2rem; width: 100%; overflow: hidden;
+    }
+    .status-headline {
+      font-size: 1.375rem; font-weight: 800; letter-spacing: -.04em;
+      background: var(--gradient-text);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: absolute; width: 100%;
+      animation: msg-in .4s cubic-bezier(.2,.75,.28,.9) both;
+    }
+    .status-headline.exiting {
+      animation: msg-out .3s ease both;
+    }
+    .status-sub {
+      font-size: .875rem; color: var(--grey71); font-weight: 400;
+    }
+    .status-timer {
+      font-size: .8rem; font-weight: 700; color: var(--grey71);
+      background: var(--greyF4); border-radius: 9999px;
+      padding: .25rem .75rem;
+      font-variant-numeric: tabular-nums; letter-spacing: .02em;
+    }
+
+    /* ── Steps Tracker ─────────────────────────────────── */
+    .steps {
+      width: 100%;
+      display: flex; flex-direction: column; gap: 0;
+      background: var(--greyF4); border-radius: 20px;
+      overflow: hidden;
+      box-shadow: var(--shadow-box);
+    }
+    .step {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid rgba(13,13,13,.05);
+      transition: background .3s;
+    }
+    .step:last-child { border-bottom: none; }
+    .step.active { background: rgba(255,88,88,.03); }
+    .step.done   { background: #fff; }
+
+    .step-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    /* pending: grey ring */
+    .step-icon.pending {
+      border: 2px solid var(--greyD9);
+      background: transparent;
+    }
+    /* active: spinner */
+    .step-icon.spinning {
+      border: 2.5px solid rgba(192,88,255,.2);
+      border-top-color: #c058ff;
+      background: transparent;
+      animation: spin .75s linear infinite;
+    }
+    /* done: gradient fill + checkmark */
+    .step-icon.done-icon {
+      background: var(--gradient);
+      border: none;
+      animation: step-done .35s cubic-bezier(.2,.75,.28,.9) both;
+    }
+    .step-icon.done-icon svg {
+      width: 13px; height: 13px;
+    }
+
+    .step-label {
+      flex: 1;
+      font-size: .875rem; font-weight: 600; color: var(--dark);
+    }
+    .step.pending-state .step-label { color: var(--grey71); font-weight: 500; }
+
+    .step-time {
+      font-size: .75rem; font-weight: 700; color: var(--grey71);
+      font-variant-numeric: tabular-nums;
+      min-width: 2.5rem; text-align: right;
+    }
+
+    /* ── Skip footer ───────────────────────────────────── */
+    .skip-footer {
+      text-align: center;
+    }
+    .skip-footer a {
+      font-size: .8rem; font-weight: 600; color: var(--grey71);
+      text-decoration: none; transition: color .15s;
+      cursor: pointer;
+    }
+    .skip-footer a:hover { color: var(--dark); }
+
+    /* ── Responsive ────────────────────────────────────── */
+    @media (max-width: 480px) {
+      .stage { width: 100%; max-width: 320px; height: 280px; }
+      .orbit-ring-3 { display: none; }
+      .orbit-wrap-4 { display: none; }
+      .waveform { width: 260px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────── -->
+<nav class="nav">
+  <a class="nav-logo" href="dashboard.html">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
+    </div>
+    <span class="nav-wordmark">Echo <em>Echo</em></span>
+  </a>
+
+  <div class="nav-divider"></div>
+  <a class="nav-back" href="dashboard.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5m7-7-7 7 7 7"/>
+    </svg>
+    Dashboard
+  </a>
+
+  <div class="nav-right">
+    <a class="skip-link" id="nav-skip-link">Skip studio render →</a>
+  </div>
+</nav>
+
+<!-- ── Page ──────────────────────────────────────────────── -->
+<main class="page">
+  <div class="container">
+
+    <!-- 1. Inspo Pills Row -->
+    <div class="pills-row" id="pills-row">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- 2. Animated Stage -->
+    <div class="stage">
+
+      <!-- Orbit rings (decorative) -->
+      <div class="orbit-ring orbit-ring-1"></div>
+      <div class="orbit-ring orbit-ring-2"></div>
+      <div class="orbit-ring orbit-ring-3"></div>
+
+      <!-- Orbiting dots -->
+      <div class="orbit-wrap orbit-wrap-1">
+        <div class="orbit-dot orbit-dot-1"></div>
+      </div>
+      <div class="orbit-wrap orbit-wrap-2">
+        <div class="orbit-dot orbit-dot-2"></div>
+      </div>
+      <div class="orbit-wrap orbit-wrap-3">
+        <div class="orbit-dot orbit-dot-3"></div>
+      </div>
+      <div class="orbit-wrap orbit-wrap-4">
+        <div class="orbit-dot orbit-dot-4"></div>
+      </div>
+
+      <!-- Central orb -->
+      <div class="orb">
+        <div class="orb-inner"></div>
+        <div class="orb-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
+        </div>
+      </div>
+
+      <!-- Waveform bars -->
+      <div class="waveform" id="waveform"></div>
+    </div>
+
+    <!-- 3. Status text -->
+    <div class="status-block">
+      <div class="status-headline-wrap">
+        <div class="status-headline" id="status-headline">Tuning your melody...</div>
+      </div>
+      <p class="status-sub" id="status-sub">Writing your lyrics, chords and instrumental…</p>
+      <div class="status-timer" id="status-timer">0:00</div>
+    </div>
+
+    <!-- 4. Generation steps -->
+    <div class="steps" id="steps-list">
+      <!-- populated by JS -->
+    </div>
+
+    <!-- 5. Skip footer -->
+    <div class="skip-footer">
+      <a id="footer-skip-link">Skip the studio render and use the live synth →</a>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  /* ── Auth Guard ─────────────────────────────────────── */
+  (function() {
+    if (!localStorage.getItem('echo_auth_token')) {
+      window.location.replace('login.html');
+    }
+  })();
+
+  /* ── Read inspo from localStorage ──────────────────── */
+  const inspo = JSON.parse(localStorage.getItem('echo_pending_inspo') || '{}');
+
+  /* ── Build inspo pills ──────────────────────────────── */
+  const pillsRow = document.getElementById('pills-row');
+  const pillDefs = [
+    { key: 'mood',       label: 'Mood' },
+    { key: 'genre',      label: 'Genre' },
+    { key: 'theme',      label: 'Theme' },
+    { key: 'instrument', label: 'Instrument' },
+    { key: 'style',      label: 'Style' },
+    { key: 'bpm',        label: 'BPM' },
+    { key: 'tempoFeel',  label: 'Tempo' },
+  ];
+
+  let pillsRendered = 0;
+  pillDefs.forEach(({ key, label }) => {
+    if (!inspo[key]) return;
+    pillsRendered++;
+    const el = document.createElement('div');
+    el.className = 'pill';
+    el.innerHTML = `<div class="pill-dot"></div><span>${label}:</span>${inspo[key]}`;
+    pillsRow.appendChild(el);
+  });
+
+  // Fallback pills if localStorage is empty
+  if (pillsRendered === 0) {
+    [['Mood', 'Energetic'], ['Genre', 'Electronic'], ['BPM', '128']].forEach(([label, val]) => {
+      const el = document.createElement('div');
+      el.className = 'pill';
+      el.innerHTML = `<div class="pill-dot"></div><span>${label}:</span>${val}`;
+      pillsRow.appendChild(el);
+    });
+  }
+
+  /* ── Build waveform bars ────────────────────────────── */
+  const waveform = document.getElementById('waveform');
+  const BAR_COUNT = 40;
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'wave-bar';
+    const minH = 4 + Math.random() * 8;
+    const maxH = 20 + Math.random() * 36;
+    const dur  = (0.5 + Math.random() * 1.3).toFixed(2);
+    const delay = (Math.random() * 1.0).toFixed(2);
+    bar.style.cssText = `--min-h:${minH}px;--max-h:${maxH}px;--dur:${dur}s;--delay:${delay}s;height:${minH}px`;
+    waveform.appendChild(bar);
+  }
+
+  /* ── Backend base URL ───────────────────────────────── */
+  const API_BASE = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+
+  /* ── Headline cycling ───────────────────────────────── */
+  const HEADLINES = [
+    'Tuning your melody...',
+    'Writing your lyrics...',
+    'Voicing the chords...',
+    'Layering instruments...',
+    'Finishing touches...',
+  ];
+  let hlIdx = 0;
+  let headlineLocked = false;
+  const hlEl = document.getElementById('status-headline');
+  const subEl = document.getElementById('status-sub');
+
+  function setHeadline(text) {
+    hlEl.classList.add('exiting');
+    setTimeout(() => {
+      hlEl.textContent = text;
+      hlEl.classList.remove('exiting');
+      hlEl.style.animation = 'none';
+      void hlEl.offsetWidth; // reflow
+      hlEl.style.animation = '';
+    }, 300);
+  }
+
+  function cycleHeadline() {
+    if (headlineLocked) return;
+    hlIdx = (hlIdx + 1) % HEADLINES.length;
+    setHeadline(HEADLINES[hlIdx]);
+  }
+  const headlineInterval = setInterval(cycleHeadline, 4000);
+
+  function setSub(text) { subEl.textContent = text; }
+
+  /* ── Elapsed timer ──────────────────────────────────── */
+  const timerEl = document.getElementById('status-timer');
+  const startTime = Date.now();
+
+  function formatTime(ms) {
+    const s = Math.floor(ms / 1000);
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2,'0')}`;
+  }
+
+  const timerInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    timerEl.textContent = formatTime(elapsed);
+  }, 500);
+
+  function cleanupTimers() {
+    clearInterval(headlineInterval);
+    clearInterval(timerInterval);
+  }
+
+  /* ── Steps ──────────────────────────────────────────── */
+  const STEPS = [
+    { id: 'step-1', label: 'Analysing mood & genre' },
+    { id: 'step-2', label: 'Writing lyrics & chords with AI' },
+    { id: 'step-3', label: 'Composing instrumental' },
+    { id: 'step-4', label: 'Finalising your track' },
+  ];
+
+  const stepsList = document.getElementById('steps-list');
+
+  STEPS.forEach((s) => {
+    const el = document.createElement('div');
+    el.className = 'step pending-state';
+    el.id = s.id;
+    el.innerHTML = `
+      <div class="step-icon pending" id="${s.id}-icon"></div>
+      <div class="step-label">${s.label}</div>
+      <div class="step-time" id="${s.id}-time"></div>
+    `;
+    stepsList.appendChild(el);
+  });
+
+  function activateStep(id) {
+    const el = document.getElementById(id);
+    const icon = document.getElementById(id + '-icon');
+    if (!el || !icon) return;
+    el.classList.remove('pending-state');
+    el.classList.add('active');
+    icon.className = 'step-icon spinning';
+  }
+
+  function completeStep(id, elapsedSec) {
+    const el = document.getElementById(id);
+    const icon = document.getElementById(id + '-icon');
+    const timeEl = document.getElementById(id + '-time');
+    if (!el || !icon) return;
+
+    el.classList.remove('active', 'pending-state');
+    el.classList.add('done');
+    icon.className = 'step-icon done-icon';
+    icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+    if (timeEl) timeEl.textContent = formatTime(elapsedSec * 1000);
+  }
+
+  /* ── Real generation flow ───────────────────────────── */
+  let skipInstrumental = false;
+  let instrumentalAbort = null;
+
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const MOOD_EMOJI = {
+    calm: '😌', melancholy: '🌧️', energetic: '🔥', euphoric: '✨',
+    rebellious: '🎸', dreamy: '🌙', romantic: '💜', happy: '☀️', dark: '🌑',
+  };
+  const ACCENTS = ['#ff5858', '#c058ff', '#3d9eff', '#f7b731'];
+
+  const ENERGY_BY_FEEL = {
+    'very slow': 2, slow: 3, 'laid back': 3, steady: 5, groovy: 6,
+    upbeat: 7, driving: 8, fast: 8, frantic: 9, 'very fast': 9,
+  };
+
+  function energyFromFeel(feel) {
+    return ENERGY_BY_FEEL[String(feel || '').toLowerCase()] || 5;
+  }
+
+  function fail(message) {
+    headlineLocked = true;
+    setHeadline('Something went wrong');
+    setSub(message + ' You can go back to the dashboard and try again.');
+    document.querySelectorAll('.step-icon.spinning').forEach((icon) => {
+      icon.className = 'step-icon pending';
+    });
+  }
+
+  async function fetchJSON(url, options) {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      let detail = '';
+      try { detail = (await res.json()).detail || ''; } catch (e) { /* ignore */ }
+      throw new Error(detail || `Request failed (${res.status})`);
+    }
+    return res.json();
+  }
+
+  async function generateInstrumental() {
+    try {
+      const health = await fetchJSON(API_BASE + '/health');
+      if (health.status !== 'ready') {
+        setSub('The MusicGen studio engine is still warming up — your track will use the live synth engine instead.');
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+
+    setSub('MusicGen is rendering a studio instrumental — this can take a couple of minutes. You can skip it any time.');
+    headlineLocked = true;
+
+    const statusPoll = setInterval(async () => {
+      try {
+        const st = await fetchJSON(API_BASE + '/generation-status');
+        if (st && st.active && st.stage) setHeadline(st.stage + '...');
+      } catch (e) { /* keep last headline */ }
+    }, 3000);
+
+    instrumentalAbort = new AbortController();
+    const hardStop = setTimeout(() => instrumentalAbort.abort(), 300000);
+
+    try {
+      const data = await fetchJSON(API_BASE + '/generate', {
+        method: 'POST',
+        signal: instrumentalAbort.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'musicgen',
+          duration: 30,
+          moods: inspo.mood ? [inspo.mood] : [],
+          genres: inspo.genre ? [inspo.genre] : [],
+          themes: inspo.theme ? [inspo.theme] : [],
+          instruments: inspo.instrument ? [inspo.instrument] : [],
+          tempo: Math.min(160, Math.max(60, Number(inspo.bpm) || 90)),
+          energy: energyFromFeel(inspo.tempoFeel),
+          custom_prompt: inspo.promptText || '',
+        }),
+      });
+      return data.audio_url || null;
+    } catch (e) {
+      return null; // skipped, aborted or failed → live synth fallback
+    } finally {
+      clearInterval(statusPoll);
+      clearTimeout(hardStop);
+      instrumentalAbort = null;
+      headlineLocked = false;
+    }
+  }
+
+  function buildTrack(spec, audioUrl) {
+    const mood = inspo.mood || 'Custom';
+    return {
+      id: 'song_' + Date.now(),
+      title: spec.title || ((inspo.theme || 'New') + ' ' + (inspo.genre || 'Track')),
+      key: spec.key,
+      chords: spec.chords,
+      sections: spec.sections,
+      vocal: spec.vocal,
+      source: spec.source,
+      mood: mood,
+      genre: inspo.genre || 'Mixed',
+      theme: inspo.theme || '',
+      instrument: inspo.instrument || '',
+      style: inspo.style || '',
+      tempoFeel: inspo.tempoFeel || '',
+      promptText: inspo.promptText || '',
+      bpm: Number(inspo.bpm) || 90,
+      audio_url: audioUrl,
+      duration: 30,
+      date: new Date().toISOString(),
+      fav: false,
+      color: ACCENTS[Math.floor(Math.random() * ACCENTS.length)],
+      emoji: MOOD_EMOJI[mood.toLowerCase()] || '🎵',
+      plays: 0,
+    };
+  }
+
+  async function runGeneration() {
+    const elapsed = () => Math.round((Date.now() - startTime) / 1000);
+    try {
+      activateStep('step-1');
+      await sleep(1400);
+      completeStep('step-1', elapsed());
+
+      activateStep('step-2');
+      const composed = await fetchJSON(API_BASE + '/api/compose', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mood: inspo.mood || '',
+          genre: inspo.genre || '',
+          theme: inspo.theme || '',
+          instrument: inspo.instrument || '',
+          style: inspo.style || '',
+          tempoFeel: inspo.tempoFeel || '',
+          bpm: Math.min(220, Math.max(40, Number(inspo.bpm) || 90)),
+          prompt: inspo.promptText || '',
+        }),
+      });
+      const spec = composed.song;
+      completeStep('step-2', elapsed());
+
+      activateStep('step-3');
+      const audioUrl = skipInstrumental ? null : await generateInstrumental();
+      completeStep('step-3', elapsed());
+
+      activateStep('step-4');
+      const track = buildTrack(spec, audioUrl);
+      localStorage.setItem('echo_current_song', JSON.stringify(track));
+      // auto-save to the library so the dashboard always has it
+      let library = [];
+      try { library = JSON.parse(localStorage.getItem('echo_tracks')) || []; } catch (e) { /* fresh */ }
+      if (!Array.isArray(library)) library = [];
+      if (!library.some((item) => item.id === track.id)) {
+        library.unshift(track);
+        localStorage.setItem('echo_tracks', JSON.stringify(library));
+      }
+      await sleep(700);
+      completeStep('step-4', elapsed());
+
+      headlineLocked = true;
+      setHeadline('Your track is ready!');
+      setSub(audioUrl
+        ? 'Studio instrumental rendered — taking you to your track…'
+        : 'Composed with the live synth engine — taking you to your track…');
+      setTimeout(() => {
+        cleanupTimers();
+        window.location.href = 'output.html';
+      }, 1100);
+    } catch (err) {
+      console.error(err);
+      cleanupTimers();
+      const network = err instanceof TypeError || /Failed to fetch|NetworkError/i.test(err.message);
+      fail(network
+        ? "Can't reach the Echo Echo server — make sure the backend is running on port 8000."
+        : err.message);
+    }
+  }
+
+  /* ── Skip links: skip the studio render only ────────── */
+  ['nav-skip-link', 'footer-skip-link'].forEach((id) => {
+    const link = document.getElementById(id);
+    if (!link) return;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      skipInstrumental = true;
+      if (instrumentalAbort) instrumentalAbort.abort();
+      setSub('Skipping the studio render — finishing with the live synth engine…');
+    });
+  });
+
+  runGeneration();
+
+  /* ── 3D parallax on the generation stage ────────────── */
+  (function () {
+    const stage = document.querySelector('.stage');
+    if (!stage || matchMedia('(pointer: coarse)').matches) return;
+    if (stage.parentElement) stage.parentElement.style.perspective = '900px';
+    document.addEventListener('mousemove', (e) => {
+      const px = e.clientX / window.innerWidth - 0.5;
+      const py = e.clientY / window.innerHeight - 0.5;
+      stage.style.transform = `rotateX(${(-py * 7).toFixed(2)}deg) rotateY(${(px * 9).toFixed(2)}deg)`;
+    });
+  })();
+</script>
+<script src="wave-bg.js"></script>
+</body>
+</html>

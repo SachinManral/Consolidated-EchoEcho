@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Echo Mode</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @keyframes fade-up {
+      0%  { opacity: 0; transform: translateY(22px); }
+      to  { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-rec {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,88,88,.4), 0 8px 32px rgba(192,88,255,.3); }
+      50%       { box-shadow: 0 0 0 24px rgba(255,88,88,0), 0 16px 50px rgba(192,88,255,.45); }
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+    @keyframes word-in {
+      0%  { opacity: 0; transform: translateY(10px) scale(.92); }
+      to  { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes toast-in {
+      0%  { opacity: 0; transform: translate(-50%, 14px); }
+      to  { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #fff; color: #0d0d0d;
+    }
+    :root {
+      --dark: #0d0d0d; --greyF4: #f4f4f4; --greyD9: #d9d9d9; --grey71: #717171;
+      --gradient: linear-gradient(0.351turn, #ff5858 23.71%, #c058ff 78.8%);
+      --gradient-text: linear-gradient(135deg, #ff5858 0%, #c058ff 100%);
+      --shadow-box: 0px 2.5px 6px rgba(0,0,0,.05), 0px 10px 50px rgba(0,0,0,.04), 0px 0px 2.5px rgba(0,0,0,.15);
+      --nav-h: 64px;
+    }
+
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      height: var(--nav-h); background: #fff;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+      display: flex; align-items: center; padding: 0 2rem; gap: 1rem;
+    }
+    .nav-logo { display: flex; align-items: center; gap: .45rem; text-decoration: none; }
+    .nav-logo-icon {
+      width: 32px; height: 32px; border-radius: 9px; background: var(--gradient);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-icon svg { width: 16px; height: 16px; }
+    .nav-wordmark { font-size: 1rem; font-weight: 800; letter-spacing: -.03em; color: var(--dark); }
+    .nav-wordmark em {
+      font-style: normal; background: var(--gradient-text);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-divider { width: 1px; height: 20px; background: rgba(13,13,13,.08); margin: 0 .25rem; }
+    .nav-back {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .875rem; font-weight: 600; color: var(--grey71);
+      text-decoration: none; transition: color .15s;
+    }
+    .nav-back:hover { color: var(--dark); }
+
+    .main { padding-top: calc(var(--nav-h) + 2.5rem); min-height: 100vh; }
+    .container {
+      max-width: 640px; margin: 0 auto; padding: 0 1.5rem 5rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1.75rem;
+      animation: fade-up .5s cubic-bezier(.2,.75,.28,.9) both;
+    }
+
+    .feature-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--gradient); color: #fff;
+      padding: .3rem .875rem; border-radius: 9999px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+    }
+    .page-headline {
+      font-size: 2.2rem; font-weight: 800; letter-spacing: -.05em;
+      text-align: center; line-height: 1.12;
+    }
+    .page-headline .gtext {
+      background: var(--gradient-text);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .page-sub { font-size: .95rem; color: var(--grey71); text-align: center; max-width: 460px; line-height: 1.6; }
+
+    /* ── Mic stage ──────────────────────────────────────── */
+    .mic-stage { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+    .mic-ring { position: relative; width: 170px; height: 170px; }
+    .mic-ring svg.ring { position: absolute; inset: 0; transform: rotate(-90deg); }
+    .ring-bg { fill: none; stroke: var(--greyF4); stroke-width: 6; }
+    .ring-fg {
+      fill: none; stroke: url(#ringGrad); stroke-width: 6; stroke-linecap: round;
+      stroke-dasharray: 503; stroke-dashoffset: 503;
+      transition: stroke-dashoffset .25s linear;
+    }
+    .mic-btn {
+      position: absolute; inset: 14px; border-radius: 50%;
+      background: var(--gradient); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .15s;
+    }
+    .mic-btn:hover { transform: scale(1.04); }
+    .mic-btn:active { transform: scale(.95); }
+    .mic-btn.recording { animation: pulse-rec 1.6s ease-in-out infinite; }
+    .mic-btn svg { width: 48px; height: 48px; }
+    .rec-timer {
+      font-size: .95rem; font-weight: 800; color: var(--dark);
+      font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: .5rem;
+    }
+    .rec-dot {
+      width: 9px; height: 9px; border-radius: 50%; background: #ff3b30;
+      animation: blink 1s ease-in-out infinite; display: none;
+    }
+    .rec-timer.live .rec-dot { display: block; }
+    .mic-hint { font-size: .82rem; color: var(--grey71); text-align: center; }
+
+    /* Live level bars */
+    .level-bars { display: flex; align-items: center; gap: 3px; height: 46px; }
+    .level-bar {
+      width: 5px; border-radius: 3px; background: var(--gradient);
+      height: 6px; opacity: .4; transition: height .08s linear, opacity .12s;
+    }
+
+    /* ── Live transcript ────────────────────────────────── */
+    .transcript-box {
+      width: 100%; min-height: 110px;
+      background: var(--greyF4); border-radius: 20px;
+      padding: 1.25rem 1.375rem;
+      box-shadow: var(--shadow-box);
+    }
+    .transcript-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--grey71); margin-bottom: .6rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .transcript-words { font-size: 1.05rem; font-weight: 600; line-height: 1.7; color: var(--dark); }
+    .transcript-words .w { display: inline-block; animation: word-in .3s cubic-bezier(.2,.75,.28,.9) both; margin-right: .3rem; }
+    .transcript-words .interim { color: var(--grey71); font-weight: 500; }
+    .transcript-placeholder { color: var(--greyD9); font-weight: 500; }
+
+    /* ── Result step ────────────────────────────────────── */
+    .result-step { width: 100%; display: none; flex-direction: column; gap: 1.1rem; }
+    .result-step.show { display: flex; animation: fade-up .45s cubic-bezier(.2,.75,.28,.9) both; }
+    .edit-area {
+      width: 100%; min-height: 110px; resize: vertical;
+      background: #fff; border: 1.5px solid rgba(13,13,13,.12);
+      border-radius: 16px; padding: 1rem 1.125rem;
+      font-family: 'Inter', sans-serif; font-size: .95rem; line-height: 1.6;
+      color: var(--dark); outline: none; transition: border-color .15s;
+    }
+    .edit-area:focus { border-color: #c058ff; }
+    .chips-label { font-size: .78rem; font-weight: 700; color: var(--dark); margin-bottom: .4rem; }
+    .chips-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .chip {
+      background: var(--greyF4); border: 1.5px solid transparent;
+      border-radius: 9999px; padding: .45rem .9rem;
+      font-size: .82rem; font-weight: 600; color: var(--dark);
+      cursor: pointer; font-family: 'Inter', sans-serif; transition: all .15s;
+    }
+    .chip.sel { background: rgba(192,88,255,.1); color: #8e30cc; border-color: rgba(192,88,255,.35); }
+
+    .bl-dark-btn {
+      background: var(--dark); color: #fff;
+      font-weight: 600; font-family: 'Inter', sans-serif;
+      border-radius: 9999px; padding: .875rem 1.75rem;
+      display: inline-flex; justify-content: center; align-items: center; gap: .5rem;
+      cursor: pointer; border: none; font-size: .95rem;
+      transition: opacity .15s, transform .15s;
+    }
+    .bl-dark-btn:hover { opacity: .88; }
+    .bl-dark-btn:active { transform: scale(.96); }
+    .bl-dark-btn.primary { background: var(--gradient); box-shadow: 0 4px 14px rgba(192,88,255,.3); }
+    .bl-dark-btn:disabled { opacity: .5; cursor: default; }
+    .bl-ghost-btn {
+      background: #fff; color: var(--dark);
+      border: 1.5px solid rgba(13,13,13,.14);
+      font-weight: 600; font-family: 'Inter', sans-serif;
+      border-radius: 9999px; padding: .875rem 1.75rem;
+      display: inline-flex; align-items: center; gap: .5rem;
+      cursor: pointer; font-size: .95rem; transition: border-color .15s;
+    }
+    .bl-ghost-btn:hover { border-color: rgba(13,13,13,.4); }
+    .actions-row { display: flex; justify-content: center; gap: .875rem; flex-wrap: wrap; }
+
+    .status-note { font-size: .82rem; color: var(--grey71); text-align: center; min-height: 1.2em; }
+    .status-note.error { color: #d43232; font-weight: 600; }
+
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translate(-50%, 14px);
+      background: var(--dark); color: #fff; font-size: .85rem; font-weight: 600;
+      padding: .75rem 1.375rem; border-radius: 9999px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+      opacity: 0; pointer-events: none; z-index: 99999;
+    }
+    .toast.show { animation: toast-in .3s cubic-bezier(.2,.75,.28,.9) both; }
+
+    @media (max-width: 480px) { .page-headline { font-size: 1.7rem; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
+    </div>
+    <span class="nav-wordmark">Echo <em>Echo</em></span>
+  </a>
+  <div class="nav-divider"></div>
+  <a class="nav-back" href="dashboard.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+    Back to Dashboard
+  </a>
+</nav>
+
+<main class="main">
+  <div class="container">
+
+    <span class="feature-badge">🎙 NEW · ECHO MODE</span>
+    <h1 class="page-headline">Sing it, hum it, play it —<br>we'll <span class="gtext">echo it back as a song</span></h1>
+    <p class="page-sub">Record up to 30 seconds of yourself singing, humming, or a song playing nearby.
+      Echo Echo transcribes the words live and composes a brand-new original tune from them.</p>
+
+    <!-- Mic stage -->
+    <div class="mic-stage" id="mic-stage">
+      <div class="mic-ring">
+        <svg class="ring" viewBox="0 0 170 170">
+          <defs>
+            <linearGradient id="ringGrad" x1="0" y1="1" x2="1" y2="0">
+              <stop offset="0" stop-color="#ff5858"/><stop offset="1" stop-color="#c058ff"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="85" cy="85" r="80"/>
+          <circle class="ring-fg" id="ring-fg" cx="85" cy="85" r="80"/>
+        </svg>
+        <button class="mic-btn" id="mic-btn" onclick="toggleRecording()" aria-label="Record">
+          <svg id="mic-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"/>
+            <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/>
+          </svg>
+        </button>
+      </div>
+      <div class="rec-timer" id="rec-timer"><span class="rec-dot"></span><span id="timer-text">0:00 / 0:30</span></div>
+      <div class="level-bars" id="level-bars"></div>
+      <p class="mic-hint" id="mic-hint">Tap the mic to start listening</p>
+    </div>
+
+    <!-- Live transcript -->
+    <div class="transcript-box">
+      <div class="transcript-label">♪ Heard lyrics <span id="transcript-status" style="text-transform:none;letter-spacing:0;font-weight:500"></span></div>
+      <div class="transcript-words" id="transcript-words">
+        <span class="transcript-placeholder">The words we hear will appear here, live…</span>
+      </div>
+    </div>
+
+    <p class="status-note" id="status-note"></p>
+
+    <!-- Result step -->
+    <div class="result-step" id="result-step">
+      <div>
+        <div class="chips-label">Touch up the heard lyrics (they become the soul of your new song)</div>
+        <textarea class="edit-area" id="edit-area" maxlength="500"></textarea>
+      </div>
+      <div>
+        <div class="chips-label">Mood of the new tune</div>
+        <div class="chips-row" id="mood-chips"></div>
+      </div>
+      <div>
+        <div class="chips-label">Genre</div>
+        <div class="chips-row" id="genre-chips"></div>
+      </div>
+      <div class="actions-row">
+        <button class="bl-dark-btn primary" id="compose-btn" onclick="composeFromEcho()">✦ Compose my tune</button>
+        <button class="bl-ghost-btn" onclick="resetRecorder()">🎙 Record again</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── Auth guard ─────────────────────────────────────── */
+  (function () {
+    if (!localStorage.getItem('echo_auth_token')) window.location.replace('login.html');
+  })();
+
+  const API_BASE = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+  const MAX_SECONDS = 30;
+  const RING_LEN = 503; // 2πr for r=80
+
+  /* ── State ──────────────────────────────────────────── */
+  let mediaStream = null;
+  let mediaRecorder = null;
+  let chunks = [];
+  let recording = false;
+  let startedAt = 0;
+  let timerInterval = null;
+  let levelRaf = null;
+  let audioCtx = null;
+  let analyser = null;
+  let recognition = null;
+  let liveFinal = '';
+  let liveInterim = '';
+
+  /* ── UI helpers ─────────────────────────────────────── */
+  const $ = (id) => document.getElementById(id);
+  let toastTimer = null;
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg; t.classList.remove('show');
+    void t.offsetWidth; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+  function setNote(text, isError) {
+    const el = $('status-note');
+    el.textContent = text || '';
+    el.classList.toggle('error', !!isError);
+  }
+
+  // level bars
+  const LEVEL_COUNT = 28;
+  for (let i = 0; i < LEVEL_COUNT; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'level-bar';
+    $('level-bars').appendChild(bar);
+  }
+  const levelEls = [...document.querySelectorAll('.level-bar')];
+
+  function renderTranscript() {
+    const box = $('transcript-words');
+    if (!liveFinal && !liveInterim) {
+      box.innerHTML = '<span class="transcript-placeholder">The words we hear will appear here, live…</span>';
+      return;
+    }
+    box.innerHTML = '';
+    liveFinal.trim().split(/\s+/).filter(Boolean).forEach((word) => {
+      const span = document.createElement('span');
+      span.className = 'w';
+      span.textContent = word;
+      box.appendChild(span);
+    });
+    if (liveInterim) {
+      const span = document.createElement('span');
+      span.className = 'w interim';
+      span.textContent = liveInterim;
+      box.appendChild(span);
+    }
+    box.parentElement.scrollTop = box.parentElement.scrollHeight;
+  }
+
+  /* ── Live speech recognition (best-effort, Chrome) ──── */
+  function startLiveRecognition() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { $('transcript-status').textContent = '· live preview unavailable in this browser'; return; }
+    recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+    recognition.onresult = (event) => {
+      liveInterim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const text = event.results[i][0].transcript;
+        if (event.results[i].isFinal) liveFinal += text + ' ';
+        else liveInterim += text;
+      }
+      renderTranscript();
+    };
+    recognition.onerror = () => { /* whisper still covers us */ };
+    try { recognition.start(); } catch (e) { /* already started */ }
+  }
+
+  function stopLiveRecognition() {
+    if (recognition) { try { recognition.stop(); } catch (e) {} recognition = null; }
+  }
+
+  /* ── Level meter ────────────────────────────────────── */
+  function startLevelMeter(stream) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    const draw = () => {
+      analyser.getByteFrequencyData(data);
+      levelEls.forEach((el, i) => {
+        const v = data[Math.floor(i * data.length / LEVEL_COUNT)] / 255;
+        el.style.height = (6 + v * 40) + 'px';
+        el.style.opacity = .35 + v * .65;
+      });
+      levelRaf = requestAnimationFrame(draw);
+    };
+    draw();
+  }
+
+  function stopLevelMeter() {
+    cancelAnimationFrame(levelRaf);
+    levelEls.forEach((el) => { el.style.height = '6px'; el.style.opacity = .4; });
+    if (audioCtx) { audioCtx.close(); audioCtx = null; }
+  }
+
+  /* ── Recording ──────────────────────────────────────── */
+  async function toggleRecording() {
+    if (recording) { stopRecording(); return; }
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (e) {
+      setNote('Microphone access was blocked — allow the mic in your browser and try again.', true);
+      return;
+    }
+    chunks = [];
+    liveFinal = ''; liveInterim = '';
+    renderTranscript();
+    $('result-step').classList.remove('show');
+    setNote('');
+
+    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+      : (MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '');
+    mediaRecorder = mime ? new MediaRecorder(mediaStream, { mimeType: mime }) : new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mediaRecorder.onstop = onRecordingDone;
+    mediaRecorder.start();
+
+    recording = true;
+    startedAt = Date.now();
+    $('mic-btn').classList.add('recording');
+    $('mic-icon').innerHTML = '<rect x="7" y="7" width="10" height="10" rx="2" fill="#fff" stroke="none"/>';
+    $('rec-timer').classList.add('live');
+    $('mic-hint').textContent = 'Listening… tap again to stop';
+    startLevelMeter(mediaStream);
+    startLiveRecognition();
+
+    timerInterval = setInterval(() => {
+      const sec = (Date.now() - startedAt) / 1000;
+      const shown = Math.min(sec, MAX_SECONDS);
+      $('timer-text').textContent = '0:' + String(Math.floor(shown)).padStart(2, '0') + ' / 0:30';
+      $('ring-fg').style.strokeDashoffset = RING_LEN * (1 - shown / MAX_SECONDS);
+      if (sec >= MAX_SECONDS) stopRecording();
+    }, 100);
+  }
+
+  function stopRecording() {
+    if (!recording) return;
+    recording = false;
+    clearInterval(timerInterval);
+    stopLiveRecognition();
+    stopLevelMeter();
+    $('mic-btn').classList.remove('recording');
+    $('mic-icon').innerHTML = '<rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/>';
+    $('rec-timer').classList.remove('live');
+    $('mic-hint').textContent = 'Tap the mic to start listening';
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    if (mediaStream) { mediaStream.getTracks().forEach((t) => t.stop()); mediaStream = null; }
+  }
+
+  async function onRecordingDone() {
+    const blob = new Blob(chunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+    if (blob.size < 1000) { setNote("That recording was too short — hold the mic open a little longer.", true); return; }
+
+    $('transcript-status').textContent = '· refining with Whisper…';
+    setNote('Transcribing your recording…');
+
+    let finalText = '';
+    try {
+      const form = new FormData();
+      const ext = blob.type.includes('mp4') ? 'm4a' : 'webm';
+      form.append('file', blob, 'echo-recording.' + ext);
+      const res = await fetch(API_BASE + '/api/transcribe', { method: 'POST', body: form });
+      const body = await res.json();
+      if (res.ok) finalText = (body.text || '').trim();
+      else setNote(body.detail || 'Transcription failed.', !liveFinal);
+    } catch (e) {
+      setNote("Couldn't reach the transcription service — using the live preview instead.", !liveFinal);
+    }
+
+    if (!finalText) finalText = liveFinal.trim();
+    $('transcript-status').textContent = finalText ? '· transcribed ✓' : '';
+    if (!finalText) {
+      setNote("We couldn't make out any words — try again a bit closer to the mic.", true);
+      return;
+    }
+
+    liveFinal = finalText; liveInterim = '';
+    renderTranscript();
+    setNote('');
+    $('edit-area').value = finalText;
+    $('result-step').classList.add('show');
+    $('result-step').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showToast('Got it! Now shape your new tune ✦');
+  }
+
+  function resetRecorder() {
+    liveFinal = ''; liveInterim = '';
+    renderTranscript();
+    $('result-step').classList.remove('show');
+    $('transcript-status').textContent = '';
+    $('ring-fg').style.strokeDashoffset = RING_LEN;
+    $('timer-text').textContent = '0:00 / 0:30';
+    setNote('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Mood / genre quick picks ───────────────────────── */
+  const MOODS = ['Dreamy', 'Melancholy', 'Energetic', 'Romantic', 'Calm', 'Euphoric'];
+  const GENRES = ['Lo-fi', 'Pop', 'Acoustic', 'R&B', 'Electronic', 'Folk'];
+  const picked = { mood: 'Dreamy', genre: 'Pop' };
+
+  function buildChips(containerId, options, key) {
+    const box = $(containerId);
+    options.forEach((option) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip' + (picked[key] === option ? ' sel' : '');
+      chip.textContent = option;
+      chip.onclick = () => {
+        picked[key] = option;
+        box.querySelectorAll('.chip').forEach((c) => c.classList.toggle('sel', c === chip));
+      };
+      box.appendChild(chip);
+    });
+  }
+  buildChips('mood-chips', MOODS, 'mood');
+  buildChips('genre-chips', GENRES, 'genre');
+
+  /* ── Hand off to the composer pipeline ──────────────── */
+  function composeFromEcho() {
+    const heard = $('edit-area').value.trim();
+    if (!heard) { showToast('Add a few words first 🎤'); return; }
+    const inspo = {
+      mood: picked.mood,
+      genre: picked.genre,
+      theme: heard.split(/\s+/).slice(0, 4).join(' '),
+      instrument: '',
+      style: 'Echo Mode',
+      bpm: 95,
+      tempoFeel: 'Steady',
+      promptText: 'Write the song inspired by and echoing these heard lyrics: "' + heard.slice(0, 400) + '"',
+    };
+    localStorage.setItem('echo_pending_inspo', JSON.stringify(inspo));
+    window.location.href = 'generate.html';
+  }
+
+  window.addEventListener('beforeunload', () => { stopRecording(); });
+</script>
+<script src="wave-bg.js"></script>
+</body>
+</html>

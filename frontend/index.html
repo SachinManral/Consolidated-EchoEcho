@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Turn Your Mood Into Music</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── bio.link exact animations ─────────────────────────── */
+    .tw-content-anim{opacity:0;transform:translateY(80px)}
+    .tw-content-anim.animate{animation:fade-up 1.2s cubic-bezier(.2,.75,.28,.9) forwards;animation-delay:.1s}
+    @keyframes fade-up{0%{opacity:0;transform:translateY(80px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes marquee{0%{transform:translateZ(0)}to{transform:translate3d(-50%,0,0)}}
+    @keyframes bg-anim{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @keyframes shine{0%{left:-40%}to{left:120%}}
+    @keyframes wave{from{height:var(--min-h,6px);opacity:.3}to{height:var(--max-h,48px);opacity:.85}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+    /* ── Reset & base ──────────────────────────────────────── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+      background:#fff;color:#0d0d0d;
+      -webkit-font-smoothing:antialiased;overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    /* ── bio.link design tokens ────────────────────────────── */
+    :root{
+      --dark:#0d0d0d;
+      --white:#ffffff;
+      --greyF4:#f4f4f4;
+      --greyF5:#f5f5f5;
+      --greyD9:#d9d9d9;
+      --grey71:#717171;
+      --green60:#1ed760;
+      --gradient:linear-gradient(0.351turn,#ff5858 23.71%,#c058ff 78.8%);
+      --gradient-text:linear-gradient(135deg,#ff5858 0%,#c058ff 100%);
+      --hero-bg:linear-gradient(0.351turn,#ff585826 23.71%,#c058ff26 78.8%);
+      --shadow-nav:0px 2px 5px rgba(0,0,0,.05),0px 8px 40px rgba(0,0,0,.04),0px 0px 2px rgba(0,0,0,.15);
+      --shadow-box:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+    }
+
+    /* ── NAVBAR (glass pill) ─ */
+    .nav-outer{
+      position:fixed;top:0;left:0;right:0;z-index:99999;
+      margin-top:10px;transition:margin-top .7s ease-in-out;
+      padding:0 2rem;
+    }
+    .nav-inner{
+      background:rgba(255,255,255,.72);
+      backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+      border:1px solid rgba(255,255,255,.85);
+      width:100%;max-width:1300px;
+      display:flex;align-items:center;
+      margin:0 auto;
+      padding:1rem 1.5rem;
+      border-radius:40px;
+      box-shadow:0 4px 32px rgba(0,0,0,.06),0 1px 0 rgba(255,255,255,.8) inset;
+    }
+    .nav-logo{display:flex;align-items:center;gap:.5rem;text-decoration:none;cursor:pointer}
+    .nav-logo-icon{
+      width:34px;height:34px;border-radius:10px;
+      background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .nav-logo-icon svg{width:18px;height:18px}
+    .nav-wordmark{
+      font-size:1.05rem;font-weight:800;letter-spacing:-.03em;color:var(--dark);
+      margin-left:.25rem;
+    }
+    .nav-wordmark em{
+      font-style:normal;
+      background:var(--gradient-text);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .nav-links{display:flex;align-items:center;margin-left:2rem;gap:1.5rem}
+    .nav-links a{
+      color:var(--dark);font-weight:600;font-size:1rem;
+      text-decoration:none;opacity:.8;
+      transition:opacity .2s;
+    }
+    .nav-links a:hover{opacity:1}
+    .nav-right{display:flex;align-items:center;justify-content:flex-end;flex:1;gap:.75rem}
+    /* bio.link nav login: text link, signup: dark pill */
+    .nav-login{
+      color:var(--dark);font-weight:600;font-size:1rem;
+      text-decoration:none;opacity:.8;transition:opacity .2s;
+    }
+    .nav-login:hover{opacity:1}
+    .nav-signup{
+      background:var(--dark);color:#fff;
+      font-weight:600;font-size:1rem;
+      border-radius:9999px;padding:.625rem 1.5rem;
+      text-decoration:none;transition:opacity .2s;
+    }
+    .nav-signup:hover{opacity:.85}
+
+    /* bio.link bl-dark-btn (expand on hover) */
+    .bl-dark-btn{
+      position:relative;
+      background:var(--dark);color:#fff;
+      font-weight:600;font-family:'Inter',sans-serif;
+      border-radius:9999px;padding:.875rem 1.75rem;
+      display:inline-flex;justify-content:center;align-items:center;
+      cursor:pointer;border:none;text-decoration:none;font-size:1rem;
+      overflow:hidden;
+    }
+    .bl-dark-btn::before{
+      content:'';position:absolute;inset:0;
+      background:var(--dark);border-radius:9999px;
+      transition:transform .12s ease;z-index:0;
+    }
+    .bl-dark-btn span{position:relative;z-index:1}
+    .bl-dark-btn:hover::before{transform:scaleX(1.031) scaleY(1.051) perspective(1px)}
+    .bl-dark-btn:active{transform:scale(.95)}
+
+    /* ── HERO ──────────────────────────────────────────────── */
+    .hero-wrap{
+      width:100%;max-width:1200px;margin:0 auto;
+      display:flex;align-items:center;
+      padding:9rem 2.5rem 4rem;gap:2rem;
+    }
+    .hero-left{width:60%;color:var(--dark);padding-left:2.5rem}
+    .hero-right{width:40%;display:flex;justify-content:center;align-items:center}
+
+    .hero-h1{
+      font-size:clamp(3rem,6.5vw,5.25rem);
+      font-weight:900;letter-spacing:-.05em;
+      line-height:1.0;margin-top:1.5rem;
+      filter:drop-shadow(0 2px 24px rgba(255,255,255,.6));
+    }
+    .hero-h4{
+      margin-top:1.5rem;font-weight:400;font-size:1.15rem;
+      line-height:1.7;color:var(--grey71);
+      max-width:460px;
+    }
+    .gtext{
+      background:var(--gradient-text);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+
+    /* Claim input area (bio.link style) */
+    .hero-claim{
+      margin-top:2rem;display:flex;align-items:center;
+      background:var(--greyF4);border-radius:9999px;
+      padding:.375rem .375rem .375rem 1.25rem;
+      max-width:440px;box-shadow:var(--shadow-box);
+    }
+    .hero-claim input{
+      flex:1;border:none;background:transparent;outline:none;
+      font-size:.95rem;font-family:'Inter',sans-serif;
+      color:var(--dark);
+    }
+    .hero-claim input::placeholder{color:rgba(13,13,13,.3)}
+
+    /* bio.link flip-box */
+    .flip-box{cursor:pointer;perspective:2000px;width:260px;height:500px}
+    .flip-box-inner{
+      border-radius:28px;position:relative;
+      transform-style:preserve-3d;
+      transition:transform .9s cubic-bezier(.19,1,.22,1);
+      will-change:transform;width:100%;height:100%;
+    }
+    .flip-box:hover .flip-box-inner{transform:rotateY(180deg)}
+    .flip-face{
+      backface-visibility:hidden;-moz-backface-visibility:hidden;
+      border-radius:28px;height:100%;overflow:hidden;
+      position:absolute;width:100%;
+    }
+    .flip-face.front{position:relative;z-index:2}
+    .flip-face.back{left:0;top:0;transform:rotateY(180deg);z-index:1}
+
+    /* Phone mock */
+    .phone{
+      width:100%;height:100%;border-radius:28px;
+      border:2px solid rgba(13,13,13,.07);
+      box-shadow:var(--shadow-box);overflow:hidden;
+      display:flex;flex-direction:column;
+    }
+    .phone-status{
+      height:26px;background:var(--dark);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 1rem;flex-shrink:0;
+    }
+    .phone-status span{color:#fff;font-size:8px;font-weight:600}
+    .phone-header{
+      background:var(--gradient);padding:.7rem 1rem .5rem;flex-shrink:0;
+    }
+    .phone-header-lbl{color:rgba(255,255,255,.65);font-size:7px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+    .phone-header-title{color:#fff;font-size:13px;font-weight:800;margin-top:.15rem}
+    .phone-body{flex:1;background:var(--greyF5);padding:.625rem;overflow:hidden}
+    .p-card{
+      background:#fff;border-radius:12px;padding:.55rem .7rem;
+      margin-bottom:.45rem;box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+    .p-card-lbl{font-size:6.5px;font-weight:700;color:var(--grey71);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem}
+    .p-waverow{display:flex;align-items:flex-end;gap:2px;height:20px;margin:.35rem 0}
+    .p-wavebar{width:3px;border-radius:2px;background:var(--gradient)}
+    .p-play{
+      display:flex;align-items:center;gap:.45rem;
+      background:var(--dark);border-radius:9px;padding:.35rem .55rem;
+    }
+    .p-play-dot{
+      width:18px;height:18px;border-radius:50%;background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .p-play-dot svg{width:7px;height:7px;fill:white}
+    .p-play-name{font-size:7.5px;font-weight:700;color:#fff}
+    .p-play-time{font-size:6.5px;color:rgba(255,255,255,.45)}
+    .p-tag{
+      display:inline-block;padding:.12rem .38rem;border-radius:999px;
+      font-size:6.5px;font-weight:600;background:rgba(255,88,88,.1);
+      color:#ff5858;margin:.08rem;
+    }
+    /* Back phone: dark mood screen */
+    .phone-b{
+      width:100%;height:100%;border-radius:28px;
+      background:#0d0d0d;padding:1rem;
+      display:flex;flex-direction:column;gap:.4rem;
+      box-shadow:var(--shadow-box);
+    }
+    .phone-b-step{font-size:7px;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em}
+    .phone-b-title{font-size:13px;font-weight:800;color:#fff}
+    .mood-grid{display:grid;grid-template-columns:1fr 1fr;gap:.35rem;margin-top:.35rem}
+    .mood-chip{
+      background:rgba(255,255,255,.07);border-radius:10px;
+      padding:.45rem .35rem;text-align:center;
+      font-size:8.5px;font-weight:600;color:rgba(255,255,255,.8);
+    }
+    .mood-chip.sel{background:rgba(255,88,88,.2);border:1px solid rgba(255,88,88,.35)}
+    .mood-emoji{font-size:15px;display:block;margin-bottom:.15rem}
+    .phone-b-next{
+      margin-top:auto;background:var(--gradient);
+      border-radius:9px;padding:.5rem;text-align:center;
+      font-size:8.5px;font-weight:700;color:#fff;
+    }
+
+    /* ── "Loved by musicians" MARQUEE (bio.link exact) ───────── */
+    .loved-section{padding-top:7rem}
+    .loved-h2{
+      color:var(--dark);font-weight:600;
+      font-size:clamp(2.25rem,5vw,3.75rem);
+      text-align:center;letter-spacing:-.045em;
+    }
+    .marquee-wrap{overflow:hidden;margin-top:2rem;position:relative}
+    .marquee-track{
+      display:flex;gap:1rem;width:max-content;
+      animation:marquee 48s linear infinite;
+    }
+    .marquee-track:hover{animation-play-state:paused}
+    /* creator cards — glass */
+    .creator-card{
+      width:180px;height:220px;border-radius:20px;
+      flex-shrink:0;overflow:hidden;
+      background:rgba(255,255,255,.28);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,.5);
+      box-shadow:0 4px 24px rgba(0,0,0,.06);
+      position:relative;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:flex-end;
+      padding:.75rem;
+    }
+    .creator-avatar{
+      width:64px;height:64px;border-radius:50%;
+      background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.4rem;font-weight:800;color:#fff;
+      position:absolute;top:1rem;left:50%;transform:translateX(-50%);
+    }
+    .creator-name{font-size:.8rem;font-weight:700;color:var(--dark);text-align:center}
+    .creator-genre{font-size:.7rem;color:var(--grey71);text-align:center;margin-top:.15rem}
+    .creator-tracks{
+      font-size:.65rem;font-weight:600;color:#ff5858;
+      background:rgba(255,88,88,.08);border-radius:999px;
+      padding:.15rem .5rem;margin-top:.35rem;
+    }
+    /* fade edges — transparent so wave shows through */
+    .mfade-l,.mfade-r{
+      pointer-events:none;position:absolute;top:0;
+      height:100%;width:6rem;z-index:10;
+    }
+    .mfade-l{left:0;background:linear-gradient(to right,rgba(255,255,255,.55),transparent)}
+    .mfade-r{right:0;background:linear-gradient(to left,rgba(255,255,255,.55),transparent)}
+
+    /* ── Section pill label ──────────────────────────────────── */
+    .sec-label{
+      display:inline-block;font-weight:500;font-size:1rem;
+      border:1px solid var(--dark);border-radius:9999px;
+      padding:.125rem .75rem;color:var(--dark);
+    }
+    .sec-title{
+      color:var(--dark);font-weight:600;
+      font-size:clamp(2.25rem,5vw,3.75rem);
+      letter-spacing:-.045em;line-height:1.08;
+    }
+
+    /* ── FEATURES GRID (bio.link exact bento) ────────────────── */
+    .features-section{
+      width:100%;max-width:1300px;margin:0 auto;
+      padding:5rem 2.5rem;
+    }
+    .features-grid-3{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:1.5rem;margin-top:3.5rem;
+    }
+    .features-grid-5{
+      display:grid;grid-template-columns:2fr 3fr;
+      gap:1.5rem;margin-top:1.5rem;
+    }
+    .features-grid-3b{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:1.5rem;margin-top:1.5rem;
+    }
+    /* feature cards — strong glass so wave shows through */
+    .f-card{
+      background:rgba(255,255,255,.26);border-radius:24px;
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,.55);
+      box-shadow:0 8px 40px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.6);
+      padding:2.5rem;height:440px;
+      position:relative;overflow:hidden;
+      display:flex;flex-direction:column;
+    }
+    .f-card-sm{
+      background:rgba(255,255,255,.26);border-radius:24px;
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,.55);
+      box-shadow:0 8px 40px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.6);
+      padding:2.5rem;height:380px;
+      position:relative;overflow:hidden;
+      display:flex;flex-direction:column;
+    }
+    .f-card-wide{
+      background:rgba(255,255,255,.26);border-radius:24px;
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,.55);
+      box-shadow:0 8px 40px rgba(0,0,0,.07),inset 0 1px 0 rgba(255,255,255,.6);
+      padding:2.5rem;
+      position:relative;overflow:hidden;
+      display:flex;flex-direction:column;min-height:320px;
+    }
+    .f-card h3{font-size:1.4rem;font-weight:600;color:var(--dark)}
+    .f-card-sm h3,.f-card-wide h3{font-size:1.4rem;font-weight:600;color:var(--dark)}
+
+    /* bio.link: scrolling phone screenshots inside bento card */
+    .scroll-shots-wrap{overflow:hidden;position:relative;margin-top:1rem;flex:1}
+    .scroll-shots{
+      display:flex;justify-content:center;align-items:flex-start;
+      width:1440px;position:relative;
+      transition:transform .5s ease;
+    }
+    .shot-item{
+      width:240px;flex-shrink:0;
+      transition:transform .5s ease,border-radius .5s ease;
+    }
+    .shot-inner{
+      border-radius:24px;overflow:hidden;
+      box-shadow:var(--shadow-box);
+      transition:transform .5s ease;
+      background:#fff;
+    }
+    .shot-inner.center{transform:scale(1.08)}
+    .shot-inner.side{transform:scale(.78);opacity:.55;border-radius:32px}
+    .shot-screen{
+      width:100%;height:220px;
+      display:flex;flex-direction:column;overflow:hidden;
+    }
+    .shot-header{height:50px;background:var(--gradient);padding:.5rem .75rem}
+    .shot-header-title{color:#fff;font-size:10px;font-weight:800}
+    .shot-header-sub{color:rgba(255,255,255,.65);font-size:7.5px;margin-top:.1rem}
+    .shot-body{flex:1;background:var(--greyF5);padding:.5rem}
+    .shot-row{
+      display:flex;align-items:center;gap:.3rem;margin-bottom:.3rem;
+      background:#fff;border-radius:8px;padding:.35rem .45rem;
+    }
+    .shot-dot{width:16px;height:16px;border-radius:5px;background:var(--gradient);flex-shrink:0}
+    .shot-text{font-size:7px;font-weight:600;color:var(--dark)}
+    .shot-sub{font-size:6px;color:var(--grey71)}
+    /* dots nav */
+    .shots-dots{
+      display:flex;justify-content:center;align-items:center;
+      gap:.5rem;position:absolute;bottom:.75rem;left:0;right:0;z-index:10;
+    }
+    .shot-dot-nav{
+      width:.625rem;height:.625rem;border-radius:9999px;
+      background:var(--greyD9);cursor:pointer;
+      transition:all .5s ease;
+    }
+    .shot-dot-nav.active{background:var(--dark);transform:scale(1.2)}
+
+    /* Visual inside bento cards */
+    .bento-vis{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-top:.75rem}
+    .mood-pill-row{display:flex;flex-wrap:wrap;gap:.5rem;padding-top:.75rem}
+    .mood-pill{
+      display:inline-flex;align-items:center;gap:.35rem;
+      background:#fff;border:1px solid rgba(13,13,13,.08);
+      border-radius:9999px;padding:.35rem .75rem;
+      font-size:.8rem;font-weight:500;color:var(--dark);
+      box-shadow:0 1px 3px rgba(0,0,0,.04);
+    }
+    .hist-list{display:flex;flex-direction:column;gap:.45rem;width:100%;padding-top:.5rem}
+    .hist-item{
+      background:#fff;border-radius:11px;padding:.55rem .8rem;
+      display:flex;align-items:center;gap:.55rem;
+      box-shadow:0 1px 3px rgba(0,0,0,.04);
+    }
+    .hist-icon{
+      width:30px;height:30px;border-radius:8px;background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    }
+    .hist-icon svg{width:12px;height:12px;fill:#fff}
+    .hist-info{flex:1;min-width:0}
+    .hist-name{font-size:.78rem;font-weight:700;color:var(--dark)}
+    .hist-meta{font-size:.68rem;color:var(--grey71);margin-top:.08rem}
+    .hist-tag{font-size:.62rem;font-weight:600;padding:.12rem .4rem;border-radius:999px;background:rgba(255,88,88,.08);color:#ff5858;flex-shrink:0}
+    /* Wave bento */
+    .bento-wave{display:flex;align-items:flex-end;gap:3px;height:72px;width:100%}
+    .bento-wavebar{width:5px;border-radius:3px;background:var(--gradient);opacity:.6}
+    /* Spectrum */
+    .spectrum{display:flex;align-items:flex-end;gap:2px;height:90px;padding-top:1.5rem;width:100%}
+    .spec-bar{flex:1;border-radius:3px 3px 0 0;background:var(--gradient);opacity:.65}
+
+    /* ── PRICING: 3 glass plans floating over the 3D ocean ───── */
+    .pricing-section{
+      position:relative;width:1100px;max-width:100%;margin:5rem auto 0;
+      padding:0 1.5rem;
+    }
+    .price-grid{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:1.5rem;margin-top:3.5rem;align-items:stretch;
+    }
+    .price-card{
+      position:relative;border-radius:28px;padding:2.25rem;
+      background:rgba(255,255,255,.3);
+      backdrop-filter:blur(20px) saturate(1.4);
+      -webkit-backdrop-filter:blur(20px) saturate(1.4);
+      border:1px solid rgba(255,255,255,.6);
+      box-shadow:0 12px 48px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.7);
+      display:flex;flex-direction:column;color:var(--dark);
+      transition:transform .35s cubic-bezier(.2,.75,.28,.9),box-shadow .35s,background .35s;
+    }
+    .price-card:hover{
+      transform:translateY(-12px) scale(1.03);
+      box-shadow:0 28px 70px rgba(0,0,0,.14),inset 0 1px 0 rgba(255,255,255,.8);
+      background:rgba(255,255,255,.48);
+    }
+    .price-card.popular{border-color:transparent}
+    .price-card.popular::before{
+      content:'';position:absolute;inset:0;border-radius:28px;
+      padding:2px;background:var(--gradient);
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude;
+      pointer-events:none;
+    }
+    .price-badge{
+      position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+      background:var(--gradient);color:#fff;
+      font-size:.66rem;font-weight:700;letter-spacing:.08em;
+      border-radius:9999px;padding:.3rem .85rem;white-space:nowrap;
+      box-shadow:0 4px 14px rgba(192,88,255,.35);
+    }
+    .price-badge.offer{background:var(--green60);box-shadow:0 4px 14px rgba(22,163,74,.3)}
+    .price-plan-name{font-weight:700;font-size:1.05rem}
+    .price-strike{font-size:.85rem;color:var(--grey71);margin-top:.6rem}
+    .price-strike b{text-decoration:line-through;font-weight:600}
+    .price-note{
+      margin-top:1.25rem;font-size:.8rem;font-weight:600;color:#8e30cc;
+      background:rgba(192,88,255,.1);border:1px solid rgba(192,88,255,.25);
+      border-radius:12px;padding:.5rem .75rem;
+    }
+    .price-cta{width:100%;margin-top:1.75rem;padding:.9rem}
+    .price-card .plan-features{flex:1}
+    @media(max-width:900px){
+      .price-grid{grid-template-columns:1fr;max-width:440px;margin:3rem auto 0}
+    }
+    .plan-price-row{
+      display:flex;align-items:baseline;margin-top:.75rem;
+      padding-bottom:1.5rem;border-bottom:1px solid rgba(13,13,13,.12);
+    }
+    .plan-price{font-size:3rem;font-weight:600;letter-spacing:-.03em}
+    .plan-period{color:var(--grey71);font-size:1rem;margin-bottom:.75rem;margin-left:.1rem}
+    .plan-features{display:flex;flex-direction:column;gap:1rem;margin-top:1.5rem}
+    .plan-feature{display:flex;align-items:center;gap:.5rem;font-size:1rem}
+    .plan-feature-icon{
+      width:20px;height:20px;flex-shrink:0;
+      background:var(--gradient-text);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      font-size:1.1rem;display:flex;align-items:center;
+    }
+
+    /* Price plan tab */
+    .price-tabs-bg{
+      background:rgba(255,255,255,.6);border-radius:9999px;
+      padding:.188rem .375rem;display:flex;position:relative;
+      width:242px;margin:2.5rem auto 0;
+    }
+    .price-tab{
+      z-index:999;position:relative;cursor:pointer;
+      font-weight:600;font-size:.875rem;height:2.5rem;
+      color:var(--dark);padding:0 .8rem;
+      border:none;background:transparent;border-radius:9999px;
+      font-family:'Inter',sans-serif;flex:1;
+    }
+    .price-tab-indicator{
+      position:absolute;right:0;top:5px;
+      height:calc(100%-10px);
+      background:#fff;border-radius:9999px;
+      box-shadow:var(--shadow-nav);
+      transition:transform .3s ease;z-index:0;
+      width:147px;transform:translateX(0);
+    }
+
+    /* ── FAQ ─────────────────────────────────────────────────── */
+    .faq-section{
+      padding:5rem 1.5rem;
+      width:840px;max-width:100%;margin:0 auto;
+    }
+    .faq-list{margin-top:2.5rem;display:flex;flex-direction:column;gap:.75rem}
+    .faq-item{
+      background:rgba(255,255,255,.26);cursor:pointer;
+      backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+      border:1px solid rgba(255,255,255,.5);
+      box-shadow:0 4px 20px rgba(0,0,0,.05);
+      border-radius:24px;padding:1.5rem;
+      transition:background .2s,box-shadow .2s;
+    }
+    .faq-item:hover{background:rgba(255,255,255,.4);box-shadow:0 8px 32px rgba(0,0,0,.09)}
+    .faq-header{display:flex;justify-content:space-between;align-items:center}
+    .faq-q{font-size:1rem;font-weight:500;color:var(--dark);flex:1;margin-right:1rem}
+    .faq-arrow{
+      transition:transform .3s ease;flex-shrink:0;
+    }
+    .faq-item.open .faq-arrow{transform:rotate(180deg)}
+    .faq-body{
+      max-height:0;overflow:hidden;
+      transition:max-height .3s ease,opacity .3s ease;
+      opacity:0;
+    }
+    .faq-item.open .faq-body{max-height:200px;opacity:1;padding-top:.75rem}
+    .faq-body p{font-size:.9375rem;line-height:1.65;color:var(--grey71)}
+
+    /* ── FOOTER (bio.link exact structure) ───────────────────── */
+    footer{
+      max-width:1100px;margin:3rem auto 0;
+      padding:2rem 2.5rem;
+    }
+    .footer-wave{width:100%;overflow:hidden;margin-bottom:3rem}
+    .footer-top{
+      display:flex;justify-content:space-between;
+      align-items:flex-start;flex-wrap:wrap;gap:2rem;
+    }
+    .footer-brand-name{
+      font-size:1.05rem;font-weight:800;
+      letter-spacing:-.03em;color:var(--dark);
+    }
+    .footer-brand-name em{
+      font-style:normal;background:var(--gradient-text);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .footer-app-btns{display:flex;align-items:center;gap:.5rem;margin-top:.75rem}
+    .footer-app-btn{
+      background:var(--dark);color:#fff;
+      border-radius:10px;padding:.4rem .875rem;
+      display:flex;align-items:center;gap:.4rem;
+      text-decoration:none;font-size:.78rem;font-weight:600;
+      transition:opacity .2s;
+    }
+    .footer-app-btn:hover{opacity:.8}
+    .footer-nav-links{
+      display:flex;gap:2.5rem;flex-wrap:wrap;align-items:center;
+    }
+    .footer-nav-links a{
+      color:var(--dark);text-decoration:none;font-size:.9rem;
+      opacity:.7;transition:opacity .2s;
+    }
+    .footer-nav-links a:hover{opacity:1}
+    .footer-bottom{
+      display:flex;justify-content:space-between;align-items:center;
+      flex-wrap:wrap;gap:1rem;padding-top:2rem;
+      border-top:1px solid rgba(13,13,13,.06);margin-top:2rem;
+    }
+    .footer-copy{font-size:.8rem;color:var(--grey71)}
+    .footer-socials{display:flex;gap:1.5rem;align-items:center}
+    .footer-socials a{color:var(--dark);text-decoration:none;opacity:.6;transition:all .15s;font-size:1.1rem}
+    .footer-socials a:hover{opacity:1;transform:scale(1.1)}
+
+    /* ── HERO 3D ATMOSPHERE ─────────────────────────────────── */
+    .hero-wrap{position:relative}
+    .hero-left,.hero-right{position:relative;z-index:1}
+    @keyframes hero-blob-a{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-26px) scale(1.15)}}
+    @keyframes hero-blob-b{0%,100%{transform:translate(0,0) scale(1.08)}50%{transform:translate(-34px,22px) scale(.92)}}
+    .hero-blob{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0}
+    .hero-blob-a{width:340px;height:340px;right:0;top:4%;background:rgba(255,88,88,.16);animation:hero-blob-a 11s ease-in-out infinite}
+    .hero-blob-b{width:300px;height:300px;right:16%;bottom:-8%;background:rgba(192,88,255,.16);animation:hero-blob-b 13s ease-in-out infinite}
+    .hero-right{perspective:1100px}
+    .flip-box{transition:transform .18s ease-out;will-change:transform}
+    @keyframes chip-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    .float-chip{
+      position:absolute;z-index:5;pointer-events:none;
+      background:rgba(255,255,255,.92);backdrop-filter:blur(6px);
+      border:1px solid rgba(13,13,13,.05);border-radius:14px;
+      box-shadow:0 10px 30px rgba(13,13,13,.12),0 2px 6px rgba(13,13,13,.06);
+      padding:.5rem .75rem;display:flex;align-items:center;gap:.45rem;
+      font-size:.78rem;font-weight:700;color:var(--dark);white-space:nowrap;
+      animation:chip-bob var(--bob,5s) ease-in-out infinite;
+      animation-delay:var(--bob-delay,0s);
+    }
+    .float-chip .fc-icon{
+      width:26px;height:26px;border-radius:8px;background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:.8rem;flex-shrink:0;
+    }
+    .fc-eq{display:flex;align-items:flex-end;gap:2.5px;height:18px}
+    .fc-eq span{width:3.5px;border-radius:2px;background:var(--gradient);--min-h:4px;--max-h:18px;animation:wave .7s ease-in-out infinite alternate}
+    .fc-eq span:nth-child(2){animation-delay:.15s}
+    .fc-eq span:nth-child(3){animation-delay:.3s}
+    .fc-eq span:nth-child(4){animation-delay:.45s}
+    @keyframes gradient-pan{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .hero-h1 .gtext{
+      background:linear-gradient(120deg,#ff5858,#c058ff,#5890ff,#ff5858);
+      background-size:280% 280%;
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+      animation:gradient-pan 6s ease infinite;
+    }
+    @media(max-width:1024px){.float-chip,.hero-blob{display:none}}
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media(max-width:1024px){
+      .hero-wrap{flex-wrap:wrap;padding:8rem 1.5rem 3rem}
+      .hero-left{width:100%;padding-left:0;text-align:center;display:flex;flex-direction:column;align-items:center}
+      .hero-right{width:100%;margin-top:2rem}
+      .features-grid-3,.features-grid-5,.features-grid-3b{grid-template-columns:1fr 1fr}
+      .f-card,.f-card-sm{height:auto;min-height:280px}
+      .pricing-section{width:95%}
+      .faq-section{width:95%}
+      .compare-wrap{width:95%}
+    }
+    @media(max-width:640px){
+      .nav-outer{padding:0 .75rem}
+      .nav-links{display:none}
+      .features-grid-3,.features-grid-5,.features-grid-3b{grid-template-columns:1fr}
+      .hero-h1{font-size:2.6rem}
+      .loved-h2{font-size:2rem}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAVBAR (bio.link floating rounded-[40px] pill) ════════ -->
+<div class="nav-outer">
+  <div class="nav-inner">
+    <a class="nav-logo" href="/">
+      <div class="nav-logo-icon">
+        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
+      </div>
+      <span class="nav-wordmark">Echo <em>Echo</em></span>
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-right">
+      <a href="login.html" class="nav-login">Log in</a>
+      <a href="login.html" class="nav-signup">Open app</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ HERO (text left + 3D flip phone right) ════════════════ -->
+<div class="tw-content-anim animate">
+  <div class="hero-wrap">
+    <div class="hero-blob hero-blob-a"></div>
+    <div class="hero-blob hero-blob-b"></div>
+    <div class="hero-left">
+      <h1 class="hero-h1">
+        Your mood,<br>now with a <span class="gtext">melody</span>
+      </h1>
+      <h4 class="hero-h4">
+        Join thousands of creators using Echo Echo.<br>
+        Pick a vibe, set the tempo, and let AI compose<br>
+        original copyright-free music in seconds.
+      </h4>
+      <div style="margin-top:2rem">
+        <button class="bl-dark-btn" onclick="handleCTA()" style="width:260px">
+          <span>Get started for free</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- bio.link flip-box 3D phone + floating 3D chips -->
+    <div class="hero-right">
+      <div class="float-chip" data-depth="1.1" style="top:7%;left:-16%;--bob:5.5s">
+        <div class="fc-icon">♪</div>Am · F · C · G
+      </div>
+      <div class="float-chip" data-depth=".7" style="top:-5%;right:-8%;--bob:6.5s;--bob-delay:.8s">
+        <div class="fc-eq"><span></span><span></span><span></span><span></span></div>Now composing…
+      </div>
+      <div class="float-chip" data-depth="1.4" style="bottom:16%;left:-22%;--bob:5s;--bob-delay:.4s">
+        <div class="fc-icon">🎤</div>AI vocals, live
+      </div>
+      <div class="float-chip" data-depth=".9" style="bottom:-3%;right:-12%;--bob:7s;--bob-delay:1.2s">
+        <div class="fc-icon">♥</div>12.4k echoes created
+      </div>
+      <div class="flip-box" id="hero-flipbox">
+        <div class="flip-box-inner" id="flip-inner">
+          <!-- Front: player screen -->
+          <div class="flip-face front">
+            <div class="phone">
+              <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+              <div class="phone-header">
+                <div class="phone-header-lbl">Now Playing</div>
+                <div class="phone-header-title">Midnight Rain — Lo-fi</div>
+              </div>
+              <div class="phone-body">
+                <div class="p-card">
+                  <div class="p-card-lbl">Generated Track</div>
+                  <div class="p-waverow" id="hero-wave"></div>
+                  <div class="p-play">
+                    <div class="p-play-dot"><svg viewBox="0 0 10 10"><polygon points="3,2 8,5 3,8"/></svg></div>
+                    <div style="flex:1">
+                      <div class="p-play-name">Midnight Rain</div>
+                      <div class="p-play-time">2:34 / 3:12</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="p-card">
+                  <div class="p-card-lbl">Tags</div>
+                  <div style="margin-top:.15rem">
+                    <span class="p-tag">Lo-fi</span>
+                    <span class="p-tag">90 BPM</span>
+                    <span class="p-tag">Melancholy</span>
+                    <span class="p-tag">Piano</span>
+                  </div>
+                </div>
+                <div class="p-card">
+                  <div class="p-card-lbl">Up next</div>
+                  <div style="font-size:.75rem;font-weight:700;color:var(--dark)">Summer Haze</div>
+                  <div style="font-size:.65rem;color:var(--grey71)">Upbeat · Jazz · 120 BPM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Back: mood selector -->
+          <div class="flip-face back">
+            <div class="phone-b">
+              <div class="phone-b-step">Step 1 of 8</div>
+              <div class="phone-b-title">Choose Your Mood</div>
+              <div class="mood-grid">
+                <div class="mood-chip"><span class="mood-emoji">😌</span>Calm</div>
+                <div class="mood-chip sel"><span class="mood-emoji">🌧️</span>Melancholy</div>
+                <div class="mood-chip"><span class="mood-emoji">🔥</span>Energetic</div>
+                <div class="mood-chip"><span class="mood-emoji">✨</span>Euphoric</div>
+                <div class="mood-chip"><span class="mood-emoji">🎸</span>Rebellious</div>
+                <div class="mood-chip"><span class="mood-emoji">🌙</span>Dreamy</div>
+              </div>
+              <div class="phone-b-next">Next →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ "LOVED BY MUSICIANS" MARQUEE (bio.link exact) ════════ -->
+<div class="loved-section tw-content-anim" style="padding:7rem 0 0">
+  <h2 class="loved-h2" style="padding:0 1rem">Loved by music creators</h2>
+  <div class="marquee-wrap" style="margin-top:2rem">
+    <div class="mfade-l"></div>
+    <div class="mfade-r"></div>
+    <div class="marquee-track" id="creators-track"></div>
+  </div>
+</div>
+
+
+<!-- ═══════════ FEATURES BENTO GRID (bio.link exact) ═════════════════ -->
+<section class="features-section" id="features">
+  <div style="text-align:center;margin-bottom:1.25rem" class="tw-content-anim">
+    <span class="sec-label">Features</span>
+  </div>
+  <h2 class="sec-title tw-content-anim" style="text-align:center">
+    Next level features,<br>unmatched sound
+  </h2>
+
+  <!-- Grid 1: 3 cols (bio.link exact: h-[440px] rounded-3xl bg-greyF4) -->
+  <div class="features-grid-3 tw-content-anim" style="--delay:.2s">
+
+    <!-- Card 1: custom domain equivalent → mood engine + scrolling shots -->
+    <div class="f-card">
+      <h3>8 parameters for infinite vibes</h3>
+      <div class="scroll-shots-wrap">
+        <div class="scroll-shots" id="shots-1">
+          <div class="shot-item"><div class="shot-inner side"><div class="shot-screen"><div class="shot-header"><div class="shot-header-title">Pick Mood</div><div class="shot-header-sub">Step 1 of 8</div></div><div class="shot-body"><div class="shot-row"><div class="shot-dot"></div><div><div class="shot-text">😌 Calm</div></div></div><div class="shot-row" style="background:rgba(255,88,88,.07)"><div class="shot-dot"></div><div><div class="shot-text" style="color:#ff5858">🌧️ Melancholy</div></div></div></div></div></div></div>
+          <div class="shot-item"><div class="shot-inner center"><div class="shot-screen"><div class="shot-header"><div class="shot-header-title">Choose Genre</div><div class="shot-header-sub">Step 2 of 8</div></div><div class="shot-body"><div class="shot-row"><div class="shot-dot"></div><div><div class="shot-text">🎹 Lo-fi Hip Hop</div></div></div><div class="shot-row"><div class="shot-dot"></div><div><div class="shot-text">🎷 Jazz</div></div></div><div class="shot-row"><div class="shot-dot"></div><div><div class="shot-text">🎸 Rock</div></div></div></div></div></div></div>
+          <div class="shot-item"><div class="shot-inner side"><div class="shot-screen"><div class="shot-header"><div class="shot-header-title">Set Tempo</div><div class="shot-header-sub">Step 6 of 8</div></div><div class="shot-body"><div style="background:#fff;border-radius:8px;padding:.4rem"><div style="font-size:7px;font-weight:700;color:var(--dark)">90 BPM</div><div style="height:3px;background:var(--greyD9);border-radius:2px;margin-top:.3rem"><div style="width:40%;height:100%;background:var(--gradient);border-radius:2px"></div></div></div></div></div></div></div>
+          <div class="shot-item"><div class="shot-inner side"><div class="shot-screen"><div class="shot-header"><div class="shot-header-title">Your Prompt</div><div class="shot-header-sub">Step 8 of 8</div></div><div class="shot-body"><div style="background:#fff;border-radius:8px;padding:.4rem;font-size:6.5px;color:var(--grey71);font-style:italic">"rainy evening, warm piano..."</div></div></div></div></div>
+          <div class="shot-item"><div class="shot-inner side"><div class="shot-screen"><div class="shot-header" style="background:var(--dark)"><div class="shot-header-title" style="color:#fff">Track Ready 🎵</div><div class="shot-header-sub">Generated in 28s</div></div><div class="shot-body" style="display:flex;flex-direction:column;gap:.3rem"><div style="background:var(--gradient);border-radius:6px;padding:.3rem;text-align:center;font-size:6.5px;font-weight:700;color:#fff">▶ Play Now</div></div></div></div></div>
+        </div>
+        <div class="shots-dots" id="dots-1">
+          <div class="shot-dot-nav active" onclick="moveShots('shots-1','dots-1',0)"></div>
+          <div class="shot-dot-nav" onclick="moveShots('shots-1','dots-1',1)"></div>
+          <div class="shot-dot-nav" onclick="moveShots('shots-1','dots-1',2)"></div>
+          <div class="shot-dot-nav" onclick="moveShots('shots-1','dots-1',3)"></div>
+          <div class="shot-dot-nav" onclick="moveShots('shots-1','dots-1',4)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: real-time generation + waveform -->
+    <div class="f-card">
+      <h3>Watch your track come alive in real-time</h3>
+      <div class="bento-vis" style="flex-direction:column;gap:.75rem">
+        <div class="bento-wave" id="bento-wave"></div>
+        <div style="background:var(--dark);border-radius:12px;padding:.625rem 1.25rem;display:flex;align-items:center;gap:.625rem;width:100%">
+          <div style="width:26px;height:26px;border-radius:50%;background:var(--gradient);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="9" height="9" viewBox="0 0 10 10" fill="white"><polygon points="3,2 8,5 3,8"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:.75rem;font-weight:700;color:#fff">Midnight Rain</div>
+            <div style="height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin-top:.35rem"><div style="width:55%;height:100%;background:var(--gradient);border-radius:2px"></div></div>
+          </div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.45)">2:34</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: track history (= bio.link "stats" card) -->
+    <div class="f-card">
+      <h3>All your tracks, always ready to play</h3>
+      <div class="bento-vis">
+        <div class="hist-list">
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">Midnight Rain</div><div class="hist-meta">Lo-fi · 90 BPM · 3:12</div></div><span class="hist-tag">New</span></div>
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">Summer Haze</div><div class="hist-meta">Jazz · 120 BPM · 2:47</div></div><span class="hist-tag" style="background:rgba(192,88,255,.08);color:#c058ff">♥</span></div>
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">City Lights</div><div class="hist-meta">Electronic · 110 BPM</div></div></div>
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">Desert Storm</div><div class="hist-meta">Rock · 140 BPM</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid 2: 5-col (2+3) -->
+  <div class="features-grid-5 tw-content-anim" style="--delay:.3s">
+    <div class="f-card-wide">
+      <h3>Embed in your projects anywhere</h3>
+      <div style="color:var(--grey71);font-size:.9rem;margin-top:.5rem;line-height:1.6">
+        Download as MP3 or WAV. Use in YouTube, Twitch, podcasts, or games. Every track is 100% copyright-free.
+      </div>
+      <div class="spectrum" id="spectrum"></div>
+    </div>
+    <div class="f-card-wide">
+      <h3>Create as many compositions as you want</h3>
+      <div style="color:var(--grey71);font-size:.9rem;margin-top:.5rem;line-height:1.6">
+        Generate unlimited tracks on Pro. Each one is unique — no two tracks are ever the same, even with the same parameters.
+      </div>
+      <div class="mood-pill-row" style="margin-top:1.25rem">
+        <span class="mood-pill">🎹 Lo-fi</span>
+        <span class="mood-pill">🎷 Jazz</span>
+        <span class="mood-pill">🎸 Rock</span>
+        <span class="mood-pill">🎻 Classical</span>
+        <span class="mood-pill">🌊 Ambient</span>
+        <span class="mood-pill">🎤 Hip-hop</span>
+        <span class="mood-pill" style="background:rgba(255,88,88,.07);border-color:rgba(255,88,88,.2);color:#ff5858">+14 more</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid 3: 3 cols (bio.link h-[380px]) -->
+  <div class="features-grid-3b tw-content-anim" style="--delay:.4s">
+    <div class="f-card-sm">
+      <h3>Build a library of your compositions</h3>
+      <div class="bento-vis">
+        <div class="hist-list">
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">Midnight Rain</div><div class="hist-meta">Lo-fi · 3:12</div></div></div>
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">Summer Haze</div><div class="hist-meta">Jazz · 2:47</div></div></div>
+          <div class="hist-item"><div class="hist-icon"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div><div class="hist-info"><div class="hist-name">City Lights</div><div class="hist-meta">Electronic · 4:01</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="f-card-sm">
+      <h3>Share your tracks and alert your fans</h3>
+      <div style="color:var(--grey71);font-size:.9rem;margin-top:.5rem;line-height:1.6">
+        Share a public link to any generated track. Let fans listen, download, and follow your music page for new releases.
+      </div>
+      <div style="flex:1;display:flex;align-items:flex-end">
+        <div style="width:100%;background:var(--greyD9);border-radius:12px;height:4px;position:relative">
+          <div style="width:65%;height:100%;background:var(--gradient);border-radius:12px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="f-card-sm">
+      <h3>Share your QR code anywhere</h3>
+      <div style="color:var(--grey71);font-size:.9rem;margin-top:.5rem;line-height:1.6">
+        Every track gets a QR code. Print it, post it, or embed it — let anyone scan and instantly listen.
+      </div>
+      <div style="flex:1;display:flex;align-items:center;justify-content:center">
+        <!-- QR code placeholder (CSS) -->
+        <div style="width:80px;height:80px;background:var(--dark);border-radius:8px;padding:8px;margin-top:1rem">
+          <div style="width:100%;height:100%;display:grid;grid-template-columns:repeat(7,1fr);gap:1px">
+            <!-- simplified QR visual -->
+          </div>
+          <div style="color:#fff;font-size:7px;text-align:center;margin-top:2px;letter-spacing:.05em">SCAN</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PRICING (3 glass plans over the 3D ocean) ═════════════ -->
+<section class="pricing-section tw-content-anim" id="pricing">
+  <div style="text-align:center;margin-bottom:1.25rem">
+    <span class="sec-label">Pricing</span>
+  </div>
+  <h1 class="sec-title" style="text-align:center">Pick your tempo</h1>
+  <h5 style="color:var(--grey71);font-weight:400;font-size:1.05rem;margin-top:1rem;text-align:center">
+    Same full Echo Echo on every plan — just choose how you pay.
+  </h5>
+
+  <div class="price-grid">
+    <!-- Weekly -->
+    <div class="price-card">
+      <div class="price-plan-name">Weekly</div>
+      <div class="plan-price-row"><span class="plan-price">$1.99</span><span class="plan-period">/week</span></div>
+      <ul class="plan-features">
+        <li class="plan-feature"><span class="plan-feature-icon">🎵</span>25 track generations / week</li>
+        <li class="plan-feature"><span class="plan-feature-icon">🎚</span>All 20+ genres &amp; moods</li>
+        <li class="plan-feature"><span class="plan-feature-icon">⬇</span>High-quality MP3 downloads</li>
+        <li class="plan-feature"><span class="plan-feature-icon">🌐</span>100% copyright-free tracks</li>
+      </ul>
+      <button class="bl-dark-btn price-cta" onclick="handleCTA()"><span>Start weekly</span></button>
+    </div>
+
+    <!-- Monthly (most popular) -->
+    <div class="price-card popular">
+      <div class="price-badge">MOST POPULAR</div>
+      <div class="price-plan-name">Monthly</div>
+      <div class="plan-price-row"><span class="plan-price">$4.99</span><span class="plan-period">/month</span></div>
+      <ul class="plan-features">
+        <li class="plan-feature"><span class="plan-feature-icon">♾</span>Unlimited track generations</li>
+        <li class="plan-feature"><span class="plan-feature-icon">🎤</span>EchoVoice AI vocals</li>
+        <li class="plan-feature"><span class="plan-feature-icon">⬇</span>MP3 &amp; WAV downloads</li>
+        <li class="plan-feature"><span class="plan-feature-icon">📊</span>Track library &amp; play history</li>
+      </ul>
+      <div class="price-note">💡 Go yearly and it&#39;s just $2.49/mo — save 50%</div>
+      <button class="bl-dark-btn price-cta" onclick="handleCTA()"><span>Go monthly</span></button>
+    </div>
+
+    <!-- Yearly (offer) -->
+    <div class="price-card">
+      <div class="price-badge offer">YEARLY OFFER · SAVE 50%</div>
+      <div class="price-plan-name">Yearly</div>
+      <div class="plan-price-row"><span class="plan-price">$29.99</span><span class="plan-period">/year</span></div>
+      <div class="price-strike"><b>$59.88</b> — billed once a year</div>
+      <ul class="plan-features">
+        <li class="plan-feature"><span class="plan-feature-icon">✨</span>Everything in Monthly</li>
+        <li class="plan-feature"><span class="plan-feature-icon">🎁</span>2 months free inside</li>
+        <li class="plan-feature"><span class="plan-feature-icon">🚀</span>Early access to new engines</li>
+        <li class="plan-feature"><span class="plan-feature-icon">💬</span>Priority support</li>
+      </ul>
+      <button class="bl-dark-btn price-cta" onclick="handleCTA()"><span>Claim yearly offer</span></button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ FAQ (bio.link exact accordion) ════════════════════════ -->
+<section class="faq-section tw-content-anim" id="faq">
+  <div style="text-align:center;margin-bottom:1.25rem"><span class="sec-label">FAQ</span></div>
+  <h1 class="sec-title" style="text-align:center">Got questions?</h1>
+  <div class="faq-list">
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <h3 class="faq-q">How does Echo Echo generate music?</h3>
+        <svg class="faq-arrow" width="12" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 1L8 8L15 1" stroke="#0D0C22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-body"><p>Echo Echo uses a fine-tuned MusicGen AI model. You provide parameters — mood, genre, tempo, instruments — plus an optional text prompt. The model composes an original audio track matching your description in under 30 seconds.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <h3 class="faq-q">Are the generated tracks copyright-free?</h3>
+        <svg class="faq-arrow" width="12" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 1L8 8L15 1" stroke="#0D0C22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-body"><p>Yes. Every track generated by Echo Echo is 100% original and copyright-free. Use them in YouTube videos, Twitch streams, podcasts, or any commercial project without licensing issues.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <h3 class="faq-q">Do I need any music knowledge to use Echo Echo?</h3>
+        <svg class="faq-arrow" width="12" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 1L8 8L15 1" stroke="#0D0C22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-body"><p>None at all. The step-by-step mood flow guides you through every parameter with simple choices and animated icons. If you know how you want to feel, Echo Echo handles the rest.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <h3 class="faq-q">How many tracks can I generate for free?</h3>
+        <svg class="faq-arrow" width="12" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 1L8 8L15 1" stroke="#0D0C22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-body"><p>The free plan includes 5 track generations per month. The Pro plan offers unlimited generations, priority queue, and higher audio quality exports.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <h3 class="faq-q">How do creators typically use Echo Echo?</h3>
+        <svg class="faq-arrow" width="12" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 1L8 8L15 1" stroke="#0D0C22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-body"><p>YouTubers use it for background music. Podcasters score their intros. Indie developers soundtrack their games. Streamers set the vibe for each session. Wherever you need original audio without a music degree, Echo Echo fits in.</p></div>
+    </div>
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-header">
+        <h3 class="faq-q">Can I download and use the tracks commercially?</h3>
+        <svg class="faq-arrow" width="12" height="9" viewBox="0 0 16 9" fill="none"><path d="M1 1L8 8L15 1" stroke="#0D0C22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="faq-body"><p>Yes. Every track can be downloaded as MP3 or WAV from your library. Pro plan users own full commercial rights to every track they generate.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ BOTTOM CTA ════════════════════════════════════════════ -->
+<section class="tw-content-anim" style="text-align:center;padding:7rem 1.5rem 5rem">
+  <div style="max-width:640px;margin:0 auto;
+    background:rgba(255,255,255,.22);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    border:1px solid rgba(255,255,255,.5);border-radius:36px;
+    padding:4rem 3rem;
+    box-shadow:0 20px 80px rgba(0,0,0,.08),inset 0 1px 0 rgba(255,255,255,.7)">
+    <div style="font-size:clamp(2rem,5vw,3.25rem);font-weight:900;letter-spacing:-.045em;line-height:1.08">
+      Turn your mood<br>into a <span class="gtext">song</span> right now
+    </div>
+    <p style="color:var(--grey71);font-size:1.05rem;margin-top:1rem;line-height:1.6">
+      No studio. No music degree. Just your vibe — and AI that listens.
+    </p>
+    <button class="bl-dark-btn" onclick="handleCTA()" style="margin:2rem auto 0;display:flex;width:260px">
+      <span>Get started for free →</span>
+    </button>
+  </div>
+</section>
+
+<!-- ═══════════ FOOTER (bio.link exact structure) ════════════════════ -->
+<div style="max-width:1100px;margin:5rem auto 0;padding:0 2.5rem">
+  <!-- gradient wave SVG divider (bio.link) -->
+  <svg width="100%" height="8" viewBox="0 0 1101 8" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:.4">
+    <path d="M0 7C5.68 7 8.58 5.05 11.13 3.35C13.44 1.82 15.26 0.61 19.16 0.61C23.05 0.61 24.87 1.82 27.18 3.35C29.73 5.05 32.63 7 38.31 7" stroke="url(#wg1)" stroke-width="1.5"/>
+    <path d="M38.31 7C44 7 46.89 5.05 49.45 3.35C51.75 1.82 53.57 0.61 57.47 0.61C61.36 0.61 63.18 1.82 65.49 3.35C68.04 5.05 70.94 7 76.62 7C82.31 7 85.2 5.05 87.76 3.35C90.07 1.82 91.89 0.61 95.78 0.61C99.68 0.61 101.5 1.82 103.8 3.35C106.36 5.05 109.25 7 114.94 7" stroke="url(#wg2)" stroke-width="1.5"/>
+    <path d="M114.94 7C120.62 7 123.52 5.05 126.07 3.35C128.38 1.82 130.2 0.61 134.1 0.61C137.99 0.61 139.81 1.82 142.12 3.35C144.67 5.05 147.57 7 153.26 7C158.95 7 161.85 5.05 164.4 3.35C166.71 1.82 168.53 0.61 172.42 0.61" stroke="url(#wg3)" stroke-width="1.5"/>
+    <defs>
+      <linearGradient id="wg1" x1="0" y1="4" x2="8" y2="-4" gradientUnits="userSpaceOnUse"><stop stop-color="#FF5858"/><stop offset="1" stop-color="#C058FF"/></linearGradient>
+      <linearGradient id="wg2" x1="38" y1="4" x2="46" y2="-4" gradientUnits="userSpaceOnUse"><stop stop-color="#FF5858"/><stop offset="1" stop-color="#C058FF"/></linearGradient>
+      <linearGradient id="wg3" x1="115" y1="4" x2="123" y2="-4" gradientUnits="userSpaceOnUse"><stop stop-color="#FF5858"/><stop offset="1" stop-color="#C058FF"/></linearGradient>
+    </defs>
+  </svg>
+
+  <div style="margin-top:3rem;padding-bottom:2rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:2rem;align-items:center">
+    <div class="footer-nav-links">
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="login.html">Log in</a>
+    </div>
+    <div class="footer-socials">
+      <a href="#" title="Twitter">𝕏</a>
+      <a href="#" title="Instagram">📸</a>
+      <a href="#" title="YouTube">▶</a>
+      <a href="#" title="TikTok">♪</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 Echo Echo. All rights reserved.</span>
+    <span class="footer-copy">Made with ♥ for music lovers</span>
+  </div>
+</div>
+
+<script>
+  /* ── Hero phone waveform ───────────────────────────── */
+  (function(){
+    const hw=document.getElementById('hero-wave');
+    for(let i=0;i<28;i++){
+      const b=document.createElement('div');b.className='p-wavebar';
+      b.style.height=(4+Math.random()*14)+'px';hw.appendChild(b);
+    }
+  })();
+
+  /* ── Auto-flip hero phone ──────────────────────────── */
+  setInterval(()=>{
+    const fi=document.getElementById('flip-inner');
+    const cur=fi.style.transform;
+    fi.style.transition='transform .9s cubic-bezier(.19,1,.22,1)';
+    fi.style.transform=cur.includes('180deg')?'rotateY(0deg)':'rotateY(180deg)';
+  },3500);
+
+  /* ── Creator cards marquee ─────────────────────────── */
+  const creators=[
+    {i:'🎹',n:'Alex M.',g:'Lo-fi Producer',t:'34 tracks'},
+    {i:'🎷',n:'Priya K.',g:'Jazz Composer',t:'21 tracks'},
+    {i:'🎸',n:'Jordan T.',g:'Rock Artist',t:'58 tracks'},
+    {i:'🎻',n:'Maria S.',g:'Orchestral',t:'12 tracks'},
+    {i:'🎤',n:'Sam W.',g:'Hip-hop',t:'47 tracks'},
+    {i:'🎵',n:'Chen L.',g:'Ambient',t:'29 tracks'},
+    {i:'🥁',n:'Dev R.',g:'Electronic',t:'61 tracks'},
+    {i:'🌊',n:'Sofia P.',g:'Chill Wave',t:'18 tracks'},
+    {i:'⚡',n:'Ryo K.',g:'Synthwave',t:'33 tracks'},
+    {i:'🌙',n:'Ana B.',g:'Dream Pop',t:'26 tracks'},
+    {i:'🔥',n:'Marcus J.',g:'Trap',t:'52 tracks'},
+    {i:'✨',n:'Lily C.',g:'Indie Folk',t:'15 tracks'},
+    {i:'🎺',n:'Omar F.',g:'Afrobeats',t:'40 tracks'},
+    {i:'🎶',n:'Zara M.',g:'R&B',t:'38 tracks'},
+  ];
+  const track=document.getElementById('creators-track');
+  [...creators,...creators].forEach(c=>{
+    const el=document.createElement('div');
+    el.className='creator-card';
+    el.innerHTML=`<div class="creator-avatar">${c.i}</div>
+      <div class="creator-name">${c.n}</div>
+      <div class="creator-genre">${c.g}</div>
+      <div class="creator-tracks">${c.t}</div>`;
+    track.appendChild(el);
+  });
+
+  /* ── Bento waveform ────────────────────────────────── */
+  (function(){
+    const bw=document.getElementById('bento-wave');
+    for(let i=0;i<46;i++){
+      const b=document.createElement('div');b.className='bento-wavebar';
+      const mn=4+Math.random()*10,mx=18+Math.random()*50;
+      const dur=.7+Math.random()*1.3,dly=(Math.random()*1.8).toFixed(2);
+      b.style.cssText=`height:${mn}px;animation:wave ${dur}s ease-in-out infinite alternate ${dly}s`;
+      b.style.setProperty('--min-h',mn+'px');
+      b.style.setProperty('--max-h',mx+'px');
+      bw.appendChild(b);
+    }
+  })();
+
+  /* ── Spectrum bars ─────────────────────────────────── */
+  (function(){
+    const sp=document.getElementById('spectrum');
+    [20,35,55,70,85,95,90,75,60,80,65,50,70,85,60,45,30,55,75,90,80,65,50,35].forEach(h=>{
+      const b=document.createElement('div');b.className='spec-bar';
+      b.style.height=h+'%';sp.appendChild(b);
+    });
+  })();
+
+  /* ── Scrolling shots inside bento card ────────────── */
+  function moveShots(trackId,dotsId,idx){
+    const t=document.getElementById(trackId);
+    const offset=idx*(240+8);
+    t.style.transform=`translateX(-${offset}px)`;
+    document.querySelectorAll('#'+dotsId+' .shot-dot-nav').forEach((d,i)=>{
+      d.classList.toggle('active',i===idx);
+    });
+  }
+
+  /* ── FAQ accordion ─────────────────────────────────── */
+  function toggleFaq(el){
+    const was=el.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));
+    if(!was) el.classList.add('open');
+  }
+
+  /* ── IntersectionObserver fade-up (bio.link) ───────── */
+  const obs=new IntersectionObserver(
+    entries=>entries.forEach(e=>{
+      if(e.isIntersecting){e.target.classList.add('animate');obs.unobserve(e.target);}
+    }),{threshold:.08}
+  );
+  document.querySelectorAll('.tw-content-anim').forEach(el=>obs.observe(el));
+
+  /* ── CTA auth ──────────────────────────────────────── */
+  function handleCTA(){
+    window.location.href=localStorage.getItem('echo_auth_token')?'dashboard.html':'login.html';
+  }
+  /* ── Hero 3D parallax (chips drift at depth, phone tilts) ── */
+  (function(){
+    if (matchMedia('(pointer: coarse)').matches) return;
+    var hero = document.querySelector('.hero-wrap');
+    var flip = document.getElementById('hero-flipbox');
+    if (!hero) return;
+    var layers = [].slice.call(hero.querySelectorAll('[data-depth]'));
+    hero.addEventListener('mousemove', function(e){
+      var r = hero.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - .5;
+      var py = (e.clientY - r.top) / r.height - .5;
+      layers.forEach(function(el){
+        var d = parseFloat(el.getAttribute('data-depth')) || 1;
+        el.style.translate = (px * d * 24) + 'px ' + (py * d * 16) + 'px';
+      });
+      if (flip) flip.style.transform = 'rotateY(' + (px * 10).toFixed(2) + 'deg) rotateX(' + (-py * 7).toFixed(2) + 'deg)';
+    });
+    hero.addEventListener('mouseleave', function(){
+      layers.forEach(function(el){ el.style.translate = '0px 0px'; });
+      if (flip) flip.style.transform = '';
+    });
+  })();
+</script>
+
+<script src="wave-bg.js"></script>
+</body>
+</html>

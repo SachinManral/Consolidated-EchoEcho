@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Your Track</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── KEYFRAMES ─────────────────────────────────────── */
+    @keyframes fade-up {
+      0%  { opacity: 0; transform: translateY(22px); }
+      to  { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes wave {
+      from { height: var(--min-h, 8px);  opacity: .35; }
+      to   { height: var(--max-h, 48px); opacity: .85; }
+    }
+    @keyframes wave-fast {
+      from { height: var(--min-h, 8px);  opacity: .55; }
+      to   { height: var(--max-h, 48px); opacity: 1; }
+    }
+    @keyframes pulse-mic {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.12); }
+    }
+    @keyframes toast-in {
+      0%  { opacity: 0; transform: translate(-50%, 14px); }
+      to  { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    /* ── RESET / BASE ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background: #fff;
+      color: #0d0d0d;
+    }
+
+    :root {
+      --dark:           #0d0d0d;
+      --white:          #fff;
+      --greyF4:         #f4f4f4;
+      --greyD9:         #d9d9d9;
+      --grey71:         #717171;
+      --gradient:       linear-gradient(0.351turn, #ff5858 23.71%, #c058ff 78.8%);
+      --gradient-text:  linear-gradient(135deg, #ff5858 0%, #c058ff 100%);
+      --shadow-box:     0px 2.5px 6px rgba(0,0,0,.05), 0px 10px 50px rgba(0,0,0,.04), 0px 0px 2.5px rgba(0,0,0,.15);
+      --nav-h:          64px;
+    }
+
+    /* ── NAV ───────────────────────────────────────────── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      height: var(--nav-h); background: #fff;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+      display: flex; align-items: center;
+      padding: 0 2rem; gap: 1rem;
+    }
+    .nav-logo { display: flex; align-items: center; gap: .45rem; text-decoration: none; }
+    .nav-logo-icon {
+      width: 32px; height: 32px; border-radius: 9px;
+      background: var(--gradient);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nav-logo-icon svg { width: 16px; height: 16px; }
+    .nav-wordmark { font-size: 1rem; font-weight: 800; letter-spacing: -.03em; color: var(--dark); }
+    .nav-wordmark em {
+      font-style: normal;
+      background: var(--gradient-text);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .nav-divider { width: 1px; height: 20px; background: rgba(13,13,13,.08); margin: 0 .25rem; }
+    .nav-back {
+      display: flex; align-items: center; gap: .4rem;
+      font-size: .875rem; font-weight: 600; color: var(--grey71);
+      text-decoration: none; transition: color .15s;
+    }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── MAIN ──────────────────────────────────────────── */
+    .main { padding-top: calc(var(--nav-h) + 2.5rem); min-height: 100vh; }
+    .container { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+    /* ── PAGE HEADER ───────────────────────────────────── */
+    .page-header {
+      text-align: center; margin-bottom: 2rem;
+      animation: fade-up .5s cubic-bezier(.2,.75,.28,.9) both;
+    }
+    .success-badge {
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: var(--gradient);
+      padding: .3rem .875rem; border-radius: 9999px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .04em;
+      color: #fff; margin-bottom: 1rem;
+    }
+    .page-headline {
+      font-size: 2.4rem; font-weight: 800; letter-spacing: -.05em;
+      color: var(--dark); line-height: 1.1; margin-bottom: .5rem;
+    }
+    .page-sub { font-size: 1rem; color: var(--grey71); margin-bottom: 1.25rem; }
+    .inspo-pills { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem; }
+    .inspo-pill {
+      background: var(--greyF4); border-radius: 9999px;
+      padding: .3rem .75rem; font-size: .75rem; font-weight: 600; color: var(--dark);
+    }
+    .inspo-pill.mood-pill  { background: rgba(255,88,88,.1);  color: #d43232; }
+    .inspo-pill.genre-pill { background: rgba(192,88,255,.1); color: #8e30cc; }
+    .inspo-pill.bpm-pill   { background: rgba(13,13,13,.05);  color: var(--grey71); }
+
+    /* ── PLAYER CARD ───────────────────────────────────── */
+    .player-card {
+      background: #fff;
+      border: 1.5px solid rgba(13,13,13,.07);
+      border-radius: 22px; overflow: hidden;
+      box-shadow: var(--shadow-box);
+      animation: fade-up .5s cubic-bezier(.2,.75,.28,.9) both .08s;
+      margin-bottom: 1.5rem;
+    }
+    .player-cover {
+      position: relative; height: 230px;
+      background: linear-gradient(0.351turn, rgba(255,88,88,.1) 23.71%, rgba(192,88,255,.1) 78.8%);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #viz { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+    @keyframes blob-float-a {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%       { transform: translate(34px, -18px) scale(1.18); }
+    }
+    @keyframes blob-float-b {
+      0%, 100% { transform: translate(0, 0) scale(1.1); }
+      50%       { transform: translate(-30px, 16px) scale(.9); }
+    }
+    .cover-blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(34px); pointer-events: none; z-index: 0;
+    }
+    .blob-a {
+      width: 200px; height: 200px; left: 8%; top: -30%;
+      background: rgba(255,88,88,.30);
+      animation: blob-float-a 9s ease-in-out infinite;
+    }
+    .blob-b {
+      width: 230px; height: 230px; right: 5%; bottom: -40%;
+      background: rgba(192,88,255,.30);
+      animation: blob-float-b 11s ease-in-out infinite;
+    }
+    /* 3D tilt */
+    .player-shell { perspective: 1200px; }
+    .player-card.tilting { transition: transform .12s ease-out; will-change: transform; }
+    .waveform { display: flex; align-items: center; gap: 3px; height: 90px; }
+    .wv-bar {
+      width: 4px; border-radius: 3px;
+      background: var(--gradient);
+      animation: wave var(--dur, 1.2s) ease-in-out infinite alternate var(--delay, 0s);
+      animation-play-state: paused; opacity: .45;
+    }
+    .player-card.playing .wv-bar {
+      animation-name: wave-fast;
+      animation-duration: calc(var(--dur, 1.2s) * .45);
+      animation-play-state: running;
+    }
+    .engine-badge {
+      position: absolute; top: .875rem; right: 1rem;
+      background: rgba(13,13,13,.65); color: #fff;
+      backdrop-filter: blur(4px);
+      font-size: .68rem; font-weight: 700; letter-spacing: .03em;
+      padding: .25rem .65rem; border-radius: 9999px;
+    }
+    .key-badge {
+      position: absolute; top: .875rem; left: 1rem;
+      background: rgba(255,255,255,.8); color: var(--dark);
+      backdrop-filter: blur(4px);
+      font-size: .68rem; font-weight: 700;
+      padding: .25rem .65rem; border-radius: 9999px;
+      border: 1px solid rgba(13,13,13,.06);
+    }
+
+    /* Controls */
+    .player-controls {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.125rem 1.375rem;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+    }
+    .play-btn {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--gradient); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(192,88,255,.35);
+      transition: transform .15s;
+    }
+    .play-btn:hover { transform: scale(1.06); }
+    .play-btn:active { transform: scale(.94); }
+    .play-btn svg { width: 20px; height: 20px; fill: #fff; }
+    .progress-zone { flex: 1; display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+    .seek-range {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; border-radius: 4px;
+      background: var(--greyF4); outline: none; cursor: pointer;
+      margin: 0; display: block;
+    }
+    .seek-range::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 15px; height: 15px; border-radius: 50%;
+      background: #fff; border: 2.5px solid #c058ff;
+      box-shadow: 0 1px 6px rgba(192,88,255,.45);
+      cursor: grab; transition: transform .12s;
+    }
+    .seek-range::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .seek-range::-webkit-slider-thumb:active { cursor: grabbing; transform: scale(1.05); }
+    .seek-range::-moz-range-thumb {
+      width: 15px; height: 15px; border-radius: 50%;
+      background: #fff; border: 2.5px solid #c058ff;
+      box-shadow: 0 1px 6px rgba(192,88,255,.45); cursor: grab;
+    }
+    .progress-times {
+      display: flex; justify-content: space-between;
+      font-size: .72rem; font-weight: 600; color: var(--grey71);
+      font-variant-numeric: tabular-nums;
+    }
+    .vocals-toggle {
+      display: flex; align-items: center; gap: .45rem;
+      background: var(--greyF4); border: 1.5px solid transparent;
+      border-radius: 9999px; padding: .45rem .9rem;
+      font-size: .78rem; font-weight: 700; color: var(--grey71);
+      cursor: pointer; font-family: 'Inter', sans-serif;
+      transition: all .15s; flex-shrink: 0;
+    }
+    .vocals-toggle.on {
+      background: rgba(192,88,255,.1); color: #8e30cc;
+      border-color: rgba(192,88,255,.3);
+    }
+    .vocals-toggle.on .mic-dot { animation: pulse-mic 1.2s ease-in-out infinite; }
+    .mic-dot { font-size: .9rem; }
+
+    /* Chord strip */
+    .chord-strip {
+      display: flex; align-items: center; gap: .6rem;
+      padding: 1rem 1.375rem;
+      border-bottom: 1px solid rgba(13,13,13,.06);
+      flex-wrap: wrap;
+    }
+    .chord-strip-label {
+      font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--grey71); margin-right: .25rem;
+    }
+    .chord-chip {
+      min-width: 52px; text-align: center;
+      background: var(--greyF4); border-radius: 12px;
+      padding: .5rem .8rem;
+      font-size: .95rem; font-weight: 800; color: var(--dark);
+      transition: all .2s;
+    }
+    .chord-chip.live {
+      background: var(--gradient); color: #fff;
+      transform: scale(1.08);
+      box-shadow: 0 4px 14px rgba(192,88,255,.35);
+    }
+
+    /* ── LYRICS / KARAOKE ──────────────────────────────── */
+    .lyrics-panel { padding: 1.375rem 1.375rem 1.75rem; max-height: 430px; overflow-y: auto; scroll-behavior: smooth; }
+    .lyrics-title {
+      font-size: .68rem; font-weight: 700; letter-spacing: .07em;
+      text-transform: uppercase; color: var(--grey71); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .lyr-section { margin-bottom: 1.375rem; }
+    .lyr-section-name {
+      display: inline-block;
+      background: rgba(13,13,13,.05); border-radius: 9999px;
+      padding: .2rem .7rem;
+      font-size: .7rem; font-weight: 700; color: var(--grey71);
+      margin-bottom: .6rem; letter-spacing: .03em;
+    }
+    .lyr-line {
+      display: flex; align-items: baseline; gap: .75rem;
+      padding: .35rem .6rem; border-radius: 10px;
+      transition: background .25s;
+    }
+    .lyr-chord {
+      font-size: .72rem; font-weight: 800; color: #8e30cc;
+      min-width: 2.4rem; flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .lyr-text { font-size: 1rem; font-weight: 500; color: var(--dark); line-height: 1.55; }
+    .lyr-line.live {
+      background: linear-gradient(0.351turn, rgba(255,88,88,.08) 23.71%, rgba(192,88,255,.08) 78.8%);
+    }
+    .lyr-line.live .lyr-text {
+      font-weight: 800;
+      background: var(--gradient-text);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .lyr-line.sung .lyr-text { color: var(--grey71); }
+
+    /* ── ACTION ROW ────────────────────────────────────── */
+    .actions-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: .875rem; flex-wrap: wrap;
+      animation: fade-up .5s cubic-bezier(.2,.75,.28,.9) both .15s;
+    }
+    .bl-dark-btn {
+      position: relative;
+      background: var(--dark); color: #fff;
+      font-weight: 600; font-family: 'Inter', sans-serif;
+      border-radius: 9999px; padding: .875rem 1.75rem;
+      display: inline-flex; justify-content: center; align-items: center; gap: .5rem;
+      cursor: pointer; border: none; text-decoration: none; font-size: .95rem;
+      transition: opacity .15s, transform .15s;
+    }
+    .bl-dark-btn:hover { opacity: .88; }
+    .bl-dark-btn:active { transform: scale(.96); }
+    .bl-dark-btn.primary { background: var(--gradient); box-shadow: 0 4px 14px rgba(192,88,255,.3); }
+    .bl-ghost-btn {
+      background: #fff; color: var(--dark);
+      border: 1.5px solid rgba(13,13,13,.14);
+      font-weight: 600; font-family: 'Inter', sans-serif;
+      border-radius: 9999px; padding: .875rem 1.75rem;
+      display: inline-flex; align-items: center; gap: .5rem;
+      cursor: pointer; text-decoration: none; font-size: .95rem;
+      transition: border-color .15s, transform .15s;
+    }
+    .bl-ghost-btn:hover { border-color: rgba(13,13,13,.4); }
+    .bl-ghost-btn:active { transform: scale(.96); }
+
+    /* ── EMPTY STATE ───────────────────────────────────── */
+    .empty-state {
+      text-align: center; padding: 5rem 1rem;
+      animation: fade-up .5s cubic-bezier(.2,.75,.28,.9) both;
+    }
+    .empty-state h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -.04em; margin-bottom: .5rem; }
+    .empty-state p { color: var(--grey71); margin-bottom: 1.5rem; }
+
+    /* ── TOAST ─────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translate(-50%, 14px);
+      background: var(--dark); color: #fff;
+      font-size: .85rem; font-weight: 600;
+      padding: .75rem 1.375rem; border-radius: 9999px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.25);
+      opacity: 0; pointer-events: none; z-index: 99999;
+    }
+    .toast.show { animation: toast-in .3s cubic-bezier(.2,.75,.28,.9) both; }
+
+    @media (max-width: 600px) {
+      .page-headline { font-size: 1.8rem; }
+      .player-controls { flex-wrap: wrap; }
+      .progress-zone { order: 3; width: 100%; flex-basis: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ─────────────────────────────────────────────── -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
+    </div>
+    <span class="nav-wordmark">Echo <em>Echo</em></span>
+  </a>
+  <div class="nav-divider"></div>
+  <a class="nav-back" href="dashboard.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5m7-7-7 7 7 7"/>
+    </svg>
+    Back to Dashboard
+  </a>
+</nav>
+
+<!-- ── Page ─────────────────────────────────────────────── -->
+<main class="main">
+  <div class="container">
+
+    <div id="empty-state" class="empty-state" style="display:none">
+      <h2>No track to show yet</h2>
+      <p>Create an inspo from your dashboard and Echo Echo will compose a song for you.</p>
+      <a class="bl-dark-btn primary" href="dashboard.html">Go to Dashboard</a>
+    </div>
+
+    <div id="player-wrap" style="display:none">
+      <!-- Header -->
+      <header class="page-header">
+        <div class="success-badge" id="success-badge">✦ TRACK READY</div>
+        <h1 class="page-headline" id="song-title">Your Track</h1>
+        <p class="page-sub" id="song-sub"></p>
+        <div class="inspo-pills" id="inspo-pills"></div>
+      </header>
+
+      <!-- Player card -->
+      <div class="player-shell">
+      <section class="player-card" id="player-card">
+        <div class="player-cover">
+          <div class="cover-blob blob-a"></div>
+          <div class="cover-blob blob-b"></div>
+          <span class="key-badge" id="key-badge"></span>
+          <span class="engine-badge" id="engine-badge"></span>
+          <canvas id="viz"></canvas>
+        </div>
+
+        <div class="player-controls">
+          <button class="play-btn" id="play-btn" onclick="togglePlay()" aria-label="Play">
+            <svg id="play-icon" viewBox="0 0 24 24"><polygon points="6,3 21,12 6,21"/></svg>
+          </button>
+          <div class="progress-zone">
+            <input type="range" class="seek-range" id="seek-range" min="0" max="1000" value="0" aria-label="Seek position">
+            <div class="progress-times">
+              <span id="time-now">0:00</span>
+              <span id="time-total">0:00</span>
+            </div>
+          </div>
+          <button class="vocals-toggle on" id="vocals-toggle" onclick="toggleVocals()">
+            <span class="mic-dot">🎤</span><span id="vocals-label">AI vocals on</span>
+          </button>
+        </div>
+
+        <div class="chord-strip" id="chord-strip">
+          <span class="chord-strip-label">Chords</span>
+        </div>
+
+        <div class="lyrics-panel" id="lyrics-panel">
+          <div class="lyrics-title">♪ Lyrics &amp; Chords <span id="lyrics-source" style="font-weight:500;text-transform:none;letter-spacing:0"></span></div>
+          <div id="lyrics-body"></div>
+        </div>
+      </section>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-row">
+        <button class="bl-dark-btn primary" id="save-btn" onclick="saveToLibrary()">
+          <span>♥</span> Save to Library
+        </button>
+        <button class="bl-ghost-btn" onclick="downloadTrack()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          <span id="download-label">Download</span>
+        </button>
+        <button class="bl-ghost-btn" onclick="generateMore()">✦ Generate More</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ── Auth guard ─────────────────────────────────────── */
+  (function () {
+    if (!localStorage.getItem('echo_auth_token')) {
+      window.location.replace('login.html');
+    }
+  })();
+
+  const API_BASE = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
+
+  /* ── Load the song ──────────────────────────────────── */
+  let song = null;
+  let fromLibrary = false;
+
+  (function loadSong() {
+    const params = new URLSearchParams(location.search);
+    const trackId = params.get('track');
+    try {
+      if (trackId) {
+        const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+        song = tracks.find((t) => t.id === trackId) || null;
+        fromLibrary = !!song;
+      }
+      if (!song) {
+        song = JSON.parse(localStorage.getItem('echo_current_song') || 'null');
+        if (song) {
+          // generated songs are auto-saved to the library now
+          const saved = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+          fromLibrary = Array.isArray(saved) && saved.some((t) => t.id === song.id);
+        }
+      }
+    } catch (e) { song = null; }
+
+    if (!song || !song.sections || !song.sections.length) {
+      song = null;
+      document.getElementById('empty-state').style.display = '';
+      return;
+    }
+    document.getElementById('player-wrap').style.display = '';
+  })();
+
+  /* ── Music theory helpers ───────────────────────────── */
+  const SEMITONES = { C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4, F: 5,
+    'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 };
+
+  function parseChord(chord) {
+    const match = /^([A-G][#b]?)(m?)$/.exec(String(chord || '').trim());
+    if (!match) return { semi: 9, minor: true }; // default Am
+    return { semi: SEMITONES[match[1]] ?? 9, minor: match[2] === 'm' };
+  }
+
+  function chordFreqs(chord) {
+    const { semi, minor } = parseChord(chord);
+    const root = 130.81 * Math.pow(2, semi / 12); // C3-based
+    return {
+      bass: root / 2,
+      triad: [root, root * Math.pow(2, (minor ? 3 : 4) / 12), root * Math.pow(2, 7 / 12)],
+    };
+  }
+
+  /* ── Build the performance timeline ─────────────────── */
+  const bpm = Math.min(220, Math.max(40, Number(song && song.bpm) || 90));
+  const BAR_SECONDS = 240 / bpm; // 4 beats per lyric line
+  const timeline = [];
+  let totalSeconds = 0;
+
+  if (song) {
+    song.sections.forEach((section, sIdx) => {
+      (section.lines || []).forEach((line, lIdx) => {
+        timeline.push({
+          sIdx, lIdx,
+          chord: line.chord || song.chords[timeline.length % song.chords.length],
+          text: line.text,
+          isChorus: /chorus/i.test(section.name || ''),
+          start: totalSeconds,
+          dur: BAR_SECONDS,
+        });
+        totalSeconds += BAR_SECONDS;
+      });
+    });
+    renderSong(); // safe here: the timeline (and totalSeconds) exist now
+  }
+
+  /* ── Render ─────────────────────────────────────────── */
+  function formatTime(secs) {
+    const s = Math.max(0, Math.floor(secs));
+    return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  function renderSong() {
+    document.title = 'Echo Echo — ' + song.title;
+    document.getElementById('song-title').textContent = song.title;
+    document.getElementById('song-sub').textContent =
+      'An original AI-composed song' + (song.theme ? ' about ' + song.theme.toLowerCase() : '') + ', sung just for you.';
+    document.getElementById('key-badge').textContent = '♪ ' + (song.key || 'A minor');
+    document.getElementById('engine-badge').textContent = song.audio_url ? '🎧 Studio instrumental' : '⚡ Live synth engine';
+    if (fromLibrary) {
+      document.getElementById('success-badge').textContent = '✦ FROM YOUR LIBRARY';
+      const saveBtn = document.getElementById('save-btn');
+      saveBtn.innerHTML = '<span>✓</span> In your Library';
+      saveBtn.onclick = () => { window.location.href = 'dashboard.html'; };
+    }
+    document.getElementById('download-label').textContent = song.audio_url ? 'Download audio' : 'Download lyric sheet';
+    if (song.source && song.source.startsWith('groq/')) {
+      document.getElementById('lyrics-source').textContent = '· written by ' + song.source.replace('groq/', '') + ' via Groq';
+    }
+
+    // Pills
+    const pills = document.getElementById('inspo-pills');
+    [[song.mood, 'mood-pill'], [song.genre, 'genre-pill'], [song.bpm ? song.bpm + ' BPM' : '', 'bpm-pill'],
+     [song.instrument, ''], [song.style, ''], [song.tempoFeel, '']].forEach(([value, cls]) => {
+      if (!value) return;
+      const el = document.createElement('span');
+      el.className = 'inspo-pill' + (cls ? ' ' + cls : '');
+      el.textContent = value;
+      pills.appendChild(el);
+    });
+
+    // Live 3D radial spectrum visualizer
+    initViz();
+
+    // Chord strip
+    const strip = document.getElementById('chord-strip');
+    (song.chords || []).forEach((chord) => {
+      const chip = document.createElement('span');
+      chip.className = 'chord-chip';
+      chip.dataset.chord = chord;
+      chip.textContent = chord;
+      strip.appendChild(chip);
+    });
+
+    // Lyrics
+    const body = document.getElementById('lyrics-body');
+    song.sections.forEach((section, sIdx) => {
+      const sec = document.createElement('div');
+      sec.className = 'lyr-section';
+      sec.innerHTML = `<span class="lyr-section-name">${section.name}</span>`;
+      (section.lines || []).forEach((line, lIdx) => {
+        const row = document.createElement('div');
+        row.className = 'lyr-line';
+        row.id = `lyr-${sIdx}-${lIdx}`;
+        row.innerHTML = `<span class="lyr-chord">${line.chord || ''}</span><span class="lyr-text"></span>`;
+        row.querySelector('.lyr-text').textContent = line.text;
+        sec.appendChild(row);
+      });
+      body.appendChild(sec);
+    });
+
+    document.getElementById('time-total').textContent = formatTime(totalSeconds);
+  }
+
+  /* ══ ECHOVOICE PERFORMANCE ENGINE ════════════════════════════════════
+     Instrumental: the MusicGen studio render when available, otherwise a
+     Web Audio synth (chord pads + bass + drums) built from the Groq
+     progression. Vocals: the Web Speech API sings each lyric line, pitched
+     by the underlying chord, in sync with the karaoke highlight.        */
+  let audioCtx = null;
+  let audioEl = null;
+  let masterGain = null;
+  let analyserNode = null;
+  let scheduledNodes = [];
+  let playing = false;
+  let startedAtCtx = 0;      // AudioContext time when playback started
+  let pausedElapsed = 0;     // seconds elapsed when paused
+  let clockTimer = null;
+  let currentLineIdx = -1;
+  let vocalsOn = true;
+  let chosenVoice = null;
+
+  function pickVoice() {
+    const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+    if (!voices.length) return null;
+    // softest-sounding voices first
+    // crystal-clear first: enhanced/natural system voices, then Google's network voices
+    const enhanced = voices.find((v) => /en/i.test(v.lang || '') && /enhanced|premium|natural|neural/i.test(v.name));
+    if (enhanced) return enhanced;
+    const preferred = ['Google US English', 'Google UK English Female', 'Samantha', 'Serena', 'Tessa', 'Moira', 'Karen', 'Victoria'];
+    for (const name of preferred) {
+      const voice = voices.find((v) => v.name.includes(name));
+      if (voice) return voice;
+    }
+    return voices.find((v) => v.lang && v.lang.startsWith('en')) || voices[0];
+  }
+  if (window.speechSynthesis) {
+    speechSynthesis.onvoiceschanged = () => { chosenVoice = pickVoice(); };
+    chosenVoice = pickVoice();
+  }
+
+  function ensureContext() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = 0.5; // instrumental ducked under the vocals
+      analyserNode = audioCtx.createAnalyser();
+      analyserNode.fftSize = 256;
+      analyserNode.smoothingTimeConstant = 0.82;
+      masterGain.connect(analyserNode);
+      analyserNode.connect(audioCtx.destination);
+    }
+    return audioCtx;
+  }
+
+  /* — Synth instrumental: schedule every bar up front — */
+  function scheduleSynth(fromSeconds) {
+    const ctx = ensureContext();
+    const t0 = ctx.currentTime + 0.06;
+    const beat = 60 / bpm;
+
+    timeline.forEach((bar) => {
+      const offset = bar.start - fromSeconds;
+      if (offset + bar.dur < 0) return;
+      const start = t0 + Math.max(0, offset);
+      const clip = offset < 0 ? -offset : 0;
+      const { bass, triad } = chordFreqs(bar.chord);
+
+      // Chord pad
+      triad.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        osc.type = i === 0 ? 'triangle' : 'sine';
+        osc.frequency.value = freq;
+        osc.detune.value = (i - 1) * 4;
+        filter.type = 'lowpass';
+        filter.frequency.value = 1400;
+        gain.gain.setValueAtTime(0.0001, start);
+        gain.gain.exponentialRampToValueAtTime(0.10, start + 0.18);
+        gain.gain.setValueAtTime(0.10, start + bar.dur - clip - 0.25);
+        gain.gain.exponentialRampToValueAtTime(0.0001, start + bar.dur - clip);
+        osc.connect(filter); filter.connect(gain); gain.connect(masterGain);
+        osc.start(start); osc.stop(start + bar.dur - clip + 0.05);
+        scheduledNodes.push(osc);
+      });
+
+      // Bass on beats 1 & 3, kick-ish thump beneath it
+      [0, 2].forEach((beatIdx) => {
+        const at = start + beatIdx * beat - clip;
+        if (at < t0 - 0.01) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(bass, at);
+        gain.gain.setValueAtTime(0.0001, at);
+        gain.gain.exponentialRampToValueAtTime(0.22, at + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, at + beat * 0.9);
+        osc.connect(gain); gain.connect(masterGain);
+        osc.start(at); osc.stop(at + beat);
+        scheduledNodes.push(osc);
+      });
+
+      // Hat ticks on every beat
+      for (let beatIdx = 0; beatIdx < 4; beatIdx++) {
+        const at = start + beatIdx * beat - clip;
+        if (at < t0 - 0.01) continue;
+        const buffer = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+        const src = ctx.createBufferSource();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass'; filter.frequency.value = 7000;
+        gain.gain.value = beatIdx === 0 ? 0.05 : 0.028;
+        src.buffer = buffer;
+        src.connect(filter); filter.connect(gain); gain.connect(masterGain);
+        src.start(at);
+        scheduledNodes.push(src);
+      }
+    });
+  }
+
+  function stopSynth() {
+    scheduledNodes.forEach((node) => { try { node.stop(); } catch (e) { /* already done */ } });
+    scheduledNodes = [];
+  }
+
+  /* — Vocals: sing the line as melodic phrases on chord tones —
+     Each line is split into up to 3 phrases, pitched along the chord
+     (root/third/fifth): rising into the chorus, falling through verses.
+     The final vowel is stretched and the line ending slowed, which is
+     what pushes it from "reading" toward "singing". */
+  const PITCH_PER_SEMITONE = 0.035;
+
+  function stretchLastVowel(word) {
+    // one gentle extra vowel — enough for a sung "hold" without slurring the word
+    return word.replace(/([aeiouy]+)([^aeiouy]*)$/i, (m, vowels, tail) => {
+      return vowels + vowels[vowels.length - 1] + tail;
+    });
+  }
+
+  function singLine(bar) {
+    if (!vocalsOn || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const vocal = song.vocal || {};
+    const { semi, minor } = parseChord(bar.chord);
+    const SOOTHE = 0.75; // narrows the melody jumps for a calmer delivery
+    const base = Math.min(1.7, Math.max(0.6, (Number(vocal.pitch) || 1) - 0.05))
+      + (bar.isChorus ? 0.12 : 0)
+      + (semi - 9) * PITCH_PER_SEMITONE * 0.4; // gentle key-follow
+    const third = (minor ? 3 : 4) * PITCH_PER_SEMITONE * SOOTHE;
+    const fifth = 7 * PITCH_PER_SEMITONE * SOOTHE;
+
+    // At most 2 utterances per line — each extra utterance adds startup
+    // silence, which is what was eating words on slower lines.
+    const words = bar.text.split(/\s+/).filter(Boolean);
+    const phrases = words.length > 4
+      ? [words.slice(0, Math.ceil(words.length / 2)), words.slice(Math.ceil(words.length / 2))]
+      : [words.slice()];
+    const contour = phrases.length === 1
+      ? [third]
+      : (bar.isChorus ? [0, fifth] : [fifth, 0]);
+
+    const lastPhrase = phrases[phrases.length - 1];
+    lastPhrase[lastPhrase.length - 1] = stretchLastVowel(lastPhrase[lastPhrase.length - 1]);
+
+    // Rate must guarantee the whole line fits inside its bar, after
+    // subtracting ~0.3s startup overhead per utterance.
+    const naturalSeconds = words.length / 2.6; // ~2.6 words/sec at rate 1
+    const available = Math.max(0.8, bar.dur - 0.3 * phrases.length);
+    const minRateToFit = naturalSeconds / available;
+    const rate = Math.min(1.5, Math.max(0.6, Math.max(minRateToFit * 1.08, (Number(vocal.rate) || 1) * 0.92)));
+
+    phrases.forEach((phrase, i) => {
+      const utter = new SpeechSynthesisUtterance(phrase.join(' '));
+      utter.pitch = Math.min(2, Math.max(0.1, base + contour[Math.min(i, contour.length - 1)]));
+      utter.rate = rate;
+      utter.volume = 1; // full clarity — the instrumental is ducked instead
+      if (chosenVoice) utter.voice = chosenVoice;
+      speechSynthesis.speak(utter);
+    });
+  }
+
+  /* — Unified clock: karaoke highlight + chords + progress — */
+  function elapsedNow() {
+    if (!playing) return pausedElapsed;
+    if (song.audio_url && audioEl) return pausedElapsed + (performance.now() - startedAtPerf) / 1000;
+    return audioCtx ? (audioCtx.currentTime - startedAtCtx) + pausedElapsed : 0;
+  }
+  let startedAtPerf = 0;
+
+  function tick() {
+    const now = elapsedNow();
+    if (now >= totalSeconds) { finishPlayback(); return; }
+
+    setProgressUI(now);
+
+    let idx = timeline.findIndex((bar) => now >= bar.start && now < bar.start + bar.dur);
+    if (idx === -1) idx = timeline.length - 1;
+    if (idx !== currentLineIdx) {
+      const prev = timeline[currentLineIdx];
+      if (prev) {
+        const prevEl = document.getElementById(`lyr-${prev.sIdx}-${prev.lIdx}`);
+        if (prevEl) { prevEl.classList.remove('live'); prevEl.classList.add('sung'); }
+      }
+      currentLineIdx = idx;
+      const bar = timeline[idx];
+      const lineEl = document.getElementById(`lyr-${bar.sIdx}-${bar.lIdx}`);
+      if (lineEl) {
+        lineEl.classList.add('live');
+        lineEl.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+      document.querySelectorAll('.chord-chip').forEach((chip) => {
+        chip.classList.toggle('live', chip.dataset.chord === bar.chord);
+      });
+      singLine(bar);
+    }
+  }
+
+  function startPlayback() {
+    const ctx = ensureContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    if (song.audio_url) {
+      if (!audioEl) {
+        audioEl = new Audio(API_BASE + song.audio_url);
+        audioEl.crossOrigin = 'anonymous';
+        audioEl.loop = true; // 30s studio render loops under the full vocal take
+        try {
+          // route through the analyser so the visualizer reacts to the studio render
+          const srcNode = ctx.createMediaElementSource(audioEl);
+          const duck = ctx.createGain();
+          duck.gain.value = 0.5; // ducked so the voice stays crystal clear on top
+          srcNode.connect(duck);
+          duck.connect(analyserNode);
+        } catch (e) {
+          audioEl.volume = 0.5; // fallback: plays directly, visualizer idles
+        }
+      }
+      if (audioEl.readyState >= 1 && isFinite(audioEl.duration) && audioEl.duration > 0) {
+        audioEl.currentTime = pausedElapsed % audioEl.duration; // honour seeks (render loops)
+      }
+      audioEl.play().catch(() => { scheduleSynth(pausedElapsed); });
+      startedAtPerf = performance.now();
+    } else {
+      scheduleSynth(pausedElapsed);
+      startedAtCtx = ctx.currentTime;
+    }
+
+    playing = true;
+    clockTimer = setInterval(tick, 120);
+    document.getElementById('player-card').classList.add('playing');
+    document.getElementById('play-icon').innerHTML = '<rect x="5" y="4" width="4.5" height="16" rx="1.5"/><rect x="14.5" y="4" width="4.5" height="16" rx="1.5"/>';
+  }
+
+  function pausePlayback() {
+    pausedElapsed = elapsedNow();
+    playing = false;
+    clearInterval(clockTimer);
+    if (audioEl) audioEl.pause();
+    stopSynth();
+    if (window.speechSynthesis) speechSynthesis.cancel();
+    document.getElementById('player-card').classList.remove('playing');
+    document.getElementById('play-icon').innerHTML = '<polygon points="6,3 21,12 6,21"/>';
+  }
+
+  function finishPlayback() {
+    pausePlayback();
+    pausedElapsed = 0;
+    currentLineIdx = -1;
+    setProgressUI(0);
+    document.querySelectorAll('.lyr-line').forEach((el) => el.classList.remove('live', 'sung'));
+    document.querySelectorAll('.chord-chip').forEach((chip) => chip.classList.remove('live'));
+    if (audioEl) audioEl.currentTime = 0;
+    showToast('That was "' + song.title + '" — play it again any time');
+  }
+
+  function togglePlay() {
+    if (!song) return;
+    if (playing) { pausePlayback(); } else { startPlayback(); }
+  }
+
+  /* — Seek bar — */
+  const seekRange = document.getElementById('seek-range');
+
+  function setProgressUI(sec) {
+    const pct = totalSeconds ? Math.min(100, (sec / totalSeconds) * 100) : 0;
+    seekRange.value = Math.round(pct * 10);
+    seekRange.style.background =
+      `linear-gradient(0.25turn, #ff5858 0%, #c058ff ${pct}%, #f4f4f4 ${pct}%)`;
+    document.getElementById('time-now').textContent = formatTime(sec);
+  }
+
+  function refreshLineStates(sec) {
+    timeline.forEach((bar) => {
+      const el = document.getElementById(`lyr-${bar.sIdx}-${bar.lIdx}`);
+      if (!el) return;
+      el.classList.remove('live');
+      el.classList.toggle('sung', bar.start + bar.dur <= sec);
+    });
+  }
+
+  let scrubWasPlaying = false;
+
+  seekRange.addEventListener('input', () => {
+    if (!song) return;
+    if (playing) { scrubWasPlaying = true; pausePlayback(); }
+    pausedElapsed = (seekRange.value / 1000) * totalSeconds;
+    setProgressUI(pausedElapsed);
+  });
+
+  seekRange.addEventListener('change', () => {
+    if (!song) return;
+    pausedElapsed = Math.min(totalSeconds - 0.05, (seekRange.value / 1000) * totalSeconds);
+    currentLineIdx = -1;
+    refreshLineStates(pausedElapsed);
+    if (scrubWasPlaying) { scrubWasPlaying = false; startPlayback(); }
+  });
+
+  function toggleVocals() {
+    vocalsOn = !vocalsOn;
+    const btn = document.getElementById('vocals-toggle');
+    btn.classList.toggle('on', vocalsOn);
+    document.getElementById('vocals-label').textContent = vocalsOn ? 'AI vocals on' : 'AI vocals off';
+    if (!vocalsOn && window.speechSynthesis) speechSynthesis.cancel();
+    showToast(vocalsOn ? 'AI vocals enabled 🎤' : 'Instrumental only');
+  }
+
+  /* ── Library / download / next steps ────────────────── */
+  function saveToLibrary() {
+    let tracks = [];
+    try { tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]'); } catch (e) { /* fresh */ }
+    if (!Array.isArray(tracks)) tracks = [];
+    if (!tracks.some((t) => t.id === song.id)) {
+      tracks.unshift(song);
+      localStorage.setItem('echo_tracks', JSON.stringify(tracks));
+    }
+    localStorage.removeItem('echo_current_song');
+    localStorage.removeItem('echo_pending_inspo');
+    showToast('Saved "' + song.title + '" to your library');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+  }
+
+  function downloadTrack() {
+    if (song.audio_url) {
+      const a = document.createElement('a');
+      a.href = API_BASE + song.audio_url;
+      a.download = song.title.replace(/[^a-z0-9 ]/gi, '') + (song.audio_url.endsWith('.mp3') ? '.mp3' : '.wav');
+      document.body.appendChild(a); a.click(); a.remove();
+      showToast('Downloading instrumental…');
+      return;
+    }
+    const lines = [song.title, (song.key || '') + ' · ' + song.bpm + ' BPM', 'Chords: ' + (song.chords || []).join(' – '), ''];
+    song.sections.forEach((section) => {
+      lines.push('[' + section.name + ']');
+      section.lines.forEach((line) => lines.push((line.chord ? line.chord.padEnd(5) : '     ') + line.text));
+      lines.push('');
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = song.title.replace(/[^a-z0-9 ]/gi, '') + ' - lyric sheet.txt';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    showToast('Lyric sheet downloaded');
+  }
+
+  function generateMore() {
+    pausePlayback();
+    localStorage.removeItem('echo_pending_inspo');
+    localStorage.setItem('echo_open_create', '1');
+    window.location.href = 'dashboard.html';
+  }
+
+  /* ── Toast ──────────────────────────────────────────── */
+  let toastTimer = null;
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+  }
+
+  /* ── 3D radial spectrum visualizer ──────────────────── */
+  function initViz() {
+    const canvas = document.getElementById('viz');
+    if (!canvas) return;
+    const g = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const BARS = 90;
+    const data = new Uint8Array(128);
+    let rotation = 0;
+
+    function resize() {
+      canvas.width = canvas.clientWidth * dpr;
+      canvas.height = canvas.clientHeight * dpr;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function draw(ts) {
+      requestAnimationFrame(draw);
+      const w = canvas.width, h = canvas.height;
+      g.clearRect(0, 0, w, h);
+      const cx = w / 2, cy = h / 2;
+      const unit = Math.min(w, h);
+
+      let energy = 0;
+      if (analyserNode && playing) {
+        analyserNode.getByteFrequencyData(data);
+        for (let i = 0; i < data.length; i++) energy += data[i];
+        energy /= data.length * 255;
+      } else {
+        for (let i = 0; i < data.length; i++) data[i] = Math.max(0, data[i] - 5); // gentle decay
+      }
+      rotation += 0.0028 + energy * 0.013;
+
+      const inner = unit * 0.21 * (1 + energy * 0.25);
+      g.lineCap = 'round';
+      g.lineWidth = Math.max(2, unit / 115);
+      for (let i = 0; i < BARS; i++) {
+        const idx = Math.floor((i / BARS) * data.length * 0.72);
+        let v = data[idx] / 255;
+        if (!playing) v = Math.max(v, 0.05 + 0.045 * Math.sin(ts / 620 + i * 0.37));
+        const angle = (i / BARS) * Math.PI * 2 + rotation;
+        const len = unit * 0.02 + v * unit * 0.17;
+        const t = i / BARS;
+        const red = Math.round(255 - 63 * t);
+        const blue = Math.round(88 + 167 * t);
+        const x1 = cx + Math.cos(angle) * inner, y1 = cy + Math.sin(angle) * inner;
+        const x2 = cx + Math.cos(angle) * (inner + len), y2 = cy + Math.sin(angle) * (inner + len);
+        g.strokeStyle = `rgba(${red},88,${blue},${0.32 + v * 0.68})`;
+        g.shadowColor = `rgba(${red},88,${blue},.85)`;
+        g.shadowBlur = 11 * v * dpr;
+        g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+      }
+      g.shadowBlur = 0;
+
+      // glowing core with the note
+      const coreR = unit * 0.135 * (1 + energy * 0.35);
+      const grad = g.createRadialGradient(cx - coreR * 0.25, cy - coreR * 0.25, coreR * 0.1, cx, cy, coreR);
+      grad.addColorStop(0, 'rgba(255,118,118,.97)');
+      grad.addColorStop(1, 'rgba(192,88,255,.9)');
+      g.fillStyle = grad;
+      g.shadowColor = 'rgba(192,88,255,.55)';
+      g.shadowBlur = 22 * dpr * (0.4 + energy);
+      g.beginPath(); g.arc(cx, cy, coreR, 0, Math.PI * 2); g.fill();
+      g.shadowBlur = 0;
+      g.fillStyle = 'rgba(255,255,255,.94)';
+      g.font = `700 ${Math.round(coreR * 1.05)}px Inter, sans-serif`;
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText('♪', cx, cy + coreR * 0.06);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  /* ── 3D tilt on the player card ─────────────────────── */
+  (function () {
+    const card = document.getElementById('player-card');
+    if (!card || matchMedia('(pointer: coarse)').matches) return;
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.animation = 'none';
+      card.classList.add('tilting');
+      card.style.transform = `rotateX(${(-py * 4).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+    });
+  })();
+
+  /* Stop singing if the tab is closed mid-performance */
+  window.addEventListener('beforeunload', () => {
+    if (window.speechSynthesis) speechSynthesis.cancel();
+  });
+</script>
+<script src="wave-bg.js"></script>
+</body>
+</html>

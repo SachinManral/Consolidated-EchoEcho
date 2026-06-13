@@ -1,0 +1,50 @@
+[
+  {
+    "_comment": "This file is responsible for local song reference data ko provide karne ke liye. Yahan sample titles, artists aur lyrics search fallback ke liye manage kiye jate hain."
+  },
+  {
+    "title": "Happy Birthday to You",
+    "artist": "Traditional",
+    "lyrics": "Happy birthday to you happy birthday to you happy birthday dear friend happy birthday to you"
+  },
+  {
+    "title": "Jingle Bells",
+    "artist": "James Lord Pierpont",
+    "lyrics": "Jingle bells jingle bells jingle all the way oh what fun it is to ride in a one horse open sleigh"
+  },
+  {
+    "title": "We Wish You a Merry Christmas",
+    "artist": "Traditional",
+    "lyrics": "We wish you a merry Christmas we wish you a merry Christmas we wish you a merry Christmas and a happy new year"
+  },
+  {
+    "title": "Silent Night",
+    "artist": "Franz Xaver Gruber",
+    "lyrics": "Silent night holy night all is calm all is bright"
+  },
+  {
+    "title": "Twinkle Twinkle Little Star",
+    "artist": "Traditional",
+    "lyrics": "Twinkle twinkle little star how I wonder what you are up above the world so high like a diamond in the sky"
+  },
+  {
+    "title": "Mary Had a Little Lamb",
+    "artist": "Traditional",
+    "lyrics": "Mary had a little lamb little lamb little lamb Mary had a little lamb its fleece was white as snow"
+  },
+  {
+    "title": "Old MacDonald Had a Farm",
+    "artist": "Traditional",
+    "lyrics": "Old MacDonald had a farm ee i ee i o and on that farm he had a cow ee i ee i o"
+  },
+  {
+    "title": "ABC Song",
+    "artist": "Traditional",
+    "lyrics": "A B C D E F G H I J K L M N O P Q R S T U V W X Y and Z"
+  },
+  {
+    "title": "Never Gonna Give You Up",
+    "artist": "Rick Astley",
+    "lyrics": "Never gonna give you up never gonna let you down"
+  }
+]

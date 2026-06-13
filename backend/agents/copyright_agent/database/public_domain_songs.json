@@ -1,0 +1,35 @@
+[
+  {
+    "_comment": "This file is responsible for public-domain song records ko organize karne ke liye. Yahan traditional titles aur known phrases matching support ke liye manage kiye jate hain."
+  },
+  {
+    "title": "Happy Birthday To You",
+    "artist": "Traditional",
+    "phrases": ["happy birthday to you", "happy birthday"]
+  },
+  {
+    "title": "Jingle Bells",
+    "artist": "Traditional",
+    "phrases": ["jingle bells", "jingle all the way"]
+  },
+  {
+    "title": "Silent Night",
+    "artist": "Traditional",
+    "phrases": ["silent night", "holy night"]
+  },
+  {
+    "title": "Twinkle Twinkle Little Star",
+    "artist": "Traditional",
+    "phrases": ["twinkle twinkle little star"]
+  },
+  {
+    "title": "Old MacDonald Had a Farm",
+    "artist": "Traditional",
+    "phrases": ["old macdonald had a farm"]
+  },
+  {
+    "title": "Mary Had a Little Lamb",
+    "artist": "Traditional",
+    "phrases": ["mary had a little lamb"]
+  }
+]

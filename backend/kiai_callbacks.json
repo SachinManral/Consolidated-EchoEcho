@@ -1,0 +1,260 @@
+[
+  {
+    "received_at": "2026-06-09T14:53:05.197539+00:00",
+    "task_id": "f0661b73411bb4b86925218a1f692397",
+    "status": "text",
+    "payload": {
+      "code": 200,
+      "data": {
+        "callbackType": "text",
+        "data": [
+          {
+            "audio_url": "",
+            "createTime": 1781016784118,
+            "id": "16235043-1acd-4134-a0c1-7aa15ba6df1c",
+            "image_url": "https://musicfile.kie.ai/MTYyMzUwNDMtMWFjZC00MTM0LWEwYzEtN2FhMTViYTZkZjFj.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_image_url": "https://cdn2.suno.ai/image_16235043-1acd-4134-a0c1-7aa15ba6df1c.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=16235043-1acd-4134-a0c1-7aa15ba6df1c",
+            "stream_audio_url": "https://musicfile.kie.ai/MTYyMzUwNDMtMWFjZC00MTM0LWEwYzEtN2FhMTViYTZkZjFj",
+            "tags": "Lo-fi, Sad, Flute, 85 BPM, energy 2/10",
+            "title": "EchoEcho Sad Love"
+          },
+          {
+            "audio_url": "",
+            "createTime": 1781016784118,
+            "id": "efa131ed-020c-4c12-9c78-73b9bfd58fc3",
+            "image_url": "https://musicfile.kie.ai/ZWZhMTMxZWQtMDIwYy00YzEyLTljNzgtNzNiOWJmZDU4ZmMz.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_image_url": "https://cdn2.suno.ai/image_efa131ed-020c-4c12-9c78-73b9bfd58fc3.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=efa131ed-020c-4c12-9c78-73b9bfd58fc3",
+            "stream_audio_url": "https://musicfile.kie.ai/ZWZhMTMxZWQtMDIwYy00YzEyLTljNzgtNzNiOWJmZDU4ZmMz",
+            "tags": "Lo-fi, Sad, Flute, 85 BPM, energy 2/10",
+            "title": "EchoEcho Sad Love"
+          }
+        ],
+        "task_id": "f0661b73411bb4b86925218a1f692397"
+      },
+      "msg": "Text generated successfully."
+    }
+  },
+  {
+    "received_at": "2026-06-09T14:54:08.702496+00:00",
+    "task_id": "f0661b73411bb4b86925218a1f692397",
+    "status": "first",
+    "payload": {
+      "code": 200,
+      "data": {
+        "callbackType": "first",
+        "data": [
+          {
+            "audio_url": "",
+            "createTime": 1781016784118,
+            "id": "16235043-1acd-4134-a0c1-7aa15ba6df1c",
+            "image_url": "https://musicfile.kie.ai/MTYyMzUwNDMtMWFjZC00MTM0LWEwYzEtN2FhMTViYTZkZjFj.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_image_url": "https://cdn2.suno.ai/image_16235043-1acd-4134-a0c1-7aa15ba6df1c.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=16235043-1acd-4134-a0c1-7aa15ba6df1c",
+            "stream_audio_url": "https://musicfile.kie.ai/MTYyMzUwNDMtMWFjZC00MTM0LWEwYzEtN2FhMTViYTZkZjFj",
+            "tags": "Lo-fi, Sad, Flute, 85 BPM, energy 2/10",
+            "title": "EchoEcho Sad Love"
+          },
+          {
+            "audio_url": "https://tempfile.aiquickdraw.com/r/adacbcfb3c4947c98983b2eea5da45d6.mp3",
+            "createTime": 1781016784118,
+            "duration": 155.12,
+            "id": "efa131ed-020c-4c12-9c78-73b9bfd58fc3",
+            "image_url": "https://musicfile.kie.ai/ZWZhMTMxZWQtMDIwYy00YzEyLTljNzgtNzNiOWJmZDU4ZmMz.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_audio_url": "https://tempfile.aiquickdraw.com/r/adacbcfb3c4947c98983b2eea5da45d6.mp3",
+            "source_image_url": "https://cdn2.suno.ai/image_efa131ed-020c-4c12-9c78-73b9bfd58fc3.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=efa131ed-020c-4c12-9c78-73b9bfd58fc3",
+            "stream_audio_url": "https://musicfile.kie.ai/ZWZhMTMxZWQtMDIwYy00YzEyLTljNzgtNzNiOWJmZDU4ZmMz",
+            "tags": "Lo-fi, Sad, Flute, 85 BPM, energy 2/10",
+            "title": "EchoEcho Sad Love"
+          }
+        ],
+        "task_id": "f0661b73411bb4b86925218a1f692397"
+      },
+      "msg": "First audio generated successfully."
+    }
+  },
+  {
+    "received_at": "2026-06-09T14:55:12.190268+00:00",
+    "task_id": "f0661b73411bb4b86925218a1f692397",
+    "status": "complete",
+    "payload": {
+      "code": 200,
+      "data": {
+        "callbackType": "complete",
+        "data": [
+          {
+            "audio_url": "https://tempfile.aiquickdraw.com/r/df6d52b071d54451a8c459cb342b821d.mp3",
+            "createTime": 1781016911144,
+            "duration": 240.0,
+            "id": "16235043-1acd-4134-a0c1-7aa15ba6df1c",
+            "image_url": "https://musicfile.kie.ai/MTYyMzUwNDMtMWFjZC00MTM0LWEwYzEtN2FhMTViYTZkZjFj.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_audio_url": "https://tempfile.aiquickdraw.com/r/df6d52b071d54451a8c459cb342b821d.mp3",
+            "source_image_url": "https://cdn2.suno.ai/image_16235043-1acd-4134-a0c1-7aa15ba6df1c.jpeg",
+            "source_stream_audio_url": "https://cdn1.suno.ai/16235043-1acd-4134-a0c1-7aa15ba6df1c.mp3",
+            "stream_audio_url": "https://musicfile.kie.ai/MTYyMzUwNDMtMWFjZC00MTM0LWEwYzEtN2FhMTViYTZkZjFj",
+            "tags": "Lo-fi, Sad, Flute, 85 BPM, energy 2/10",
+            "title": "EchoEcho Sad Love"
+          },
+          {
+            "audio_url": "https://tempfile.aiquickdraw.com/r/adacbcfb3c4947c98983b2eea5da45d6.mp3",
+            "createTime": 1781016911144,
+            "duration": 155.12,
+            "id": "efa131ed-020c-4c12-9c78-73b9bfd58fc3",
+            "image_url": "https://musicfile.kie.ai/ZWZhMTMxZWQtMDIwYy00YzEyLTljNzgtNzNiOWJmZDU4ZmMz.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_audio_url": "https://tempfile.aiquickdraw.com/r/adacbcfb3c4947c98983b2eea5da45d6.mp3",
+            "source_image_url": "https://cdn2.suno.ai/image_efa131ed-020c-4c12-9c78-73b9bfd58fc3.jpeg",
+            "source_stream_audio_url": "https://cdn1.suno.ai/efa131ed-020c-4c12-9c78-73b9bfd58fc3.mp3",
+            "stream_audio_url": "https://musicfile.kie.ai/ZWZhMTMxZWQtMDIwYy00YzEyLTljNzgtNzNiOWJmZDU4ZmMz",
+            "tags": "Lo-fi, Sad, Flute, 85 BPM, energy 2/10",
+            "title": "EchoEcho Sad Love"
+          }
+        ],
+        "task_id": "f0661b73411bb4b86925218a1f692397"
+      },
+      "msg": "All generated successfully."
+    }
+  },
+  {
+    "received_at": "2026-06-09T15:12:31.263651+00:00",
+    "task_id": "ea490e66cc7654b2b059b3048cfb296a",
+    "status": "text",
+    "payload": {
+      "code": 200,
+      "data": {
+        "callbackType": "text",
+        "data": [
+          {
+            "audio_url": "",
+            "createTime": 1781017950246,
+            "id": "7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a",
+            "image_url": "https://musicfile.kie.ai/N2JkYzdkNWMtOWIyYy00ZGYwLWJhMTMtOGUyYzJmODE4Yzdh.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_image_url": "https://cdn2.suno.ai/image_7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a",
+            "stream_audio_url": "https://musicfile.kie.ai/N2JkYzdkNWMtOWIyYy00ZGYwLWJhMTMtOGUyYzJmODE4Yzdh",
+            "tags": "Lo-fi, Romantic, Piano, Guitar, 90 BPM, energy 2/10",
+            "title": "EchoEcho Romantic Rain"
+          },
+          {
+            "audio_url": "",
+            "createTime": 1781017950246,
+            "id": "159ff1f3-9039-42df-b845-b85f7e9e52d9",
+            "image_url": "https://musicfile.kie.ai/MTU5ZmYxZjMtOTAzOS00MmRmLWI4NDUtYjg1ZjdlOWU1MmQ5.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_image_url": "https://cdn2.suno.ai/image_159ff1f3-9039-42df-b845-b85f7e9e52d9.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=159ff1f3-9039-42df-b845-b85f7e9e52d9",
+            "stream_audio_url": "https://musicfile.kie.ai/MTU5ZmYxZjMtOTAzOS00MmRmLWI4NDUtYjg1ZjdlOWU1MmQ5",
+            "tags": "Lo-fi, Romantic, Piano, Guitar, 90 BPM, energy 2/10",
+            "title": "EchoEcho Romantic Rain"
+          }
+        ],
+        "task_id": "ea490e66cc7654b2b059b3048cfb296a"
+      },
+      "msg": "Text generated successfully."
+    }
+  },
+  {
+    "received_at": "2026-06-09T15:13:20.599074+00:00",
+    "task_id": "ea490e66cc7654b2b059b3048cfb296a",
+    "status": "first",
+    "payload": {
+      "code": 200,
+      "data": {
+        "callbackType": "first",
+        "data": [
+          {
+            "audio_url": "",
+            "createTime": 1781017950246,
+            "id": "7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a",
+            "image_url": "https://musicfile.kie.ai/N2JkYzdkNWMtOWIyYy00ZGYwLWJhMTMtOGUyYzJmODE4Yzdh.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_image_url": "https://cdn2.suno.ai/image_7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a",
+            "stream_audio_url": "https://musicfile.kie.ai/N2JkYzdkNWMtOWIyYy00ZGYwLWJhMTMtOGUyYzJmODE4Yzdh",
+            "tags": "Lo-fi, Romantic, Piano, Guitar, 90 BPM, energy 2/10",
+            "title": "EchoEcho Romantic Rain"
+          },
+          {
+            "audio_url": "https://tempfile.aiquickdraw.com/r/6c5c7756863442c686ea902307233c7a.mp3",
+            "createTime": 1781017950246,
+            "duration": 113.76,
+            "id": "159ff1f3-9039-42df-b845-b85f7e9e52d9",
+            "image_url": "https://musicfile.kie.ai/MTU5ZmYxZjMtOTAzOS00MmRmLWI4NDUtYjg1ZjdlOWU1MmQ5.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_audio_url": "https://tempfile.aiquickdraw.com/r/6c5c7756863442c686ea902307233c7a.mp3",
+            "source_image_url": "https://cdn2.suno.ai/image_159ff1f3-9039-42df-b845-b85f7e9e52d9.jpeg",
+            "source_stream_audio_url": "https://audiopipe.suno.ai/?item_id=159ff1f3-9039-42df-b845-b85f7e9e52d9",
+            "stream_audio_url": "https://musicfile.kie.ai/MTU5ZmYxZjMtOTAzOS00MmRmLWI4NDUtYjg1ZjdlOWU1MmQ5",
+            "tags": "Lo-fi, Romantic, Piano, Guitar, 90 BPM, energy 2/10",
+            "title": "EchoEcho Romantic Rain"
+          }
+        ],
+        "task_id": "ea490e66cc7654b2b059b3048cfb296a"
+      },
+      "msg": "First audio generated successfully."
+    }
+  },
+  {
+    "received_at": "2026-06-09T15:14:09.254984+00:00",
+    "task_id": "ea490e66cc7654b2b059b3048cfb296a",
+    "status": "complete",
+    "payload": {
+      "code": 200,
+      "data": {
+        "callbackType": "complete",
+        "data": [
+          {
+            "audio_url": "https://tempfile.aiquickdraw.com/r/85819d8156084da384d82eeaf3d6c334.mp3",
+            "createTime": 1781018048214,
+            "duration": 240.0,
+            "id": "7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a",
+            "image_url": "https://musicfile.kie.ai/N2JkYzdkNWMtOWIyYy00ZGYwLWJhMTMtOGUyYzJmODE4Yzdh.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_audio_url": "https://tempfile.aiquickdraw.com/r/85819d8156084da384d82eeaf3d6c334.mp3",
+            "source_image_url": "https://cdn2.suno.ai/image_7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a.jpeg",
+            "source_stream_audio_url": "https://cdn1.suno.ai/7bdc7d5c-9b2c-4df0-ba13-8e2c2f818c7a.mp3",
+            "stream_audio_url": "https://musicfile.kie.ai/N2JkYzdkNWMtOWIyYy00ZGYwLWJhMTMtOGUyYzJmODE4Yzdh",
+            "tags": "Lo-fi, Romantic, Piano, Guitar, 90 BPM, energy 2/10",
+            "title": "EchoEcho Romantic Rain"
+          },
+          {
+            "audio_url": "https://tempfile.aiquickdraw.com/r/6c5c7756863442c686ea902307233c7a.mp3",
+            "createTime": 1781018048214,
+            "duration": 113.76,
+            "id": "159ff1f3-9039-42df-b845-b85f7e9e52d9",
+            "image_url": "https://musicfile.kie.ai/MTU5ZmYxZjMtOTAzOS00MmRmLWI4NDUtYjg1ZjdlOWU1MmQ5.jpeg",
+            "model_name": "chirp-v4",
+            "prompt": "",
+            "source_audio_url": "https://tempfile.aiquickdraw.com/r/6c5c7756863442c686ea902307233c7a.mp3",
+            "source_image_url": "https://cdn2.suno.ai/image_159ff1f3-9039-42df-b845-b85f7e9e52d9.jpeg",
+            "source_stream_audio_url": "https://cdn1.suno.ai/159ff1f3-9039-42df-b845-b85f7e9e52d9.mp3",
+            "stream_audio_url": "https://musicfile.kie.ai/MTU5ZmYxZjMtOTAzOS00MmRmLWI4NDUtYjg1ZjdlOWU1MmQ5",
+            "tags": "Lo-fi, Romantic, Piano, Guitar, 90 BPM, energy 2/10",
+            "title": "EchoEcho Romantic Rain"
+          }
+        ],
+        "task_id": "ea490e66cc7654b2b059b3048cfb296a"
+      },
+      "msg": "All generated successfully."
+    }
+  }
+]

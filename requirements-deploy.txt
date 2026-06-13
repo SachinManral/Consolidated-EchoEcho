@@ -1,0 +1,12 @@
+# Lean dependency set for cloud deployment (free tiers).
+# MusicGen (torch/transformers) and CrewAI are intentionally excluded —
+# the app degrades gracefully: Groq writes the songs, the browser's
+# live synth engine plays them, and the Web Speech voice sings them.
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-dotenv==1.0.1
+httpx==0.28.1
+pydub==0.25.1
+# audioop-lts intentionally omitted: it only exists for Python 3.13+,
+# and the deploy pins Python 3.12 where audioop is still in the stdlib.
+python-multipart==0.0.20
