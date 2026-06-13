@@ -48,7 +48,12 @@ Thumbs.db
 # Generated media/output
 modelV/backend/generated/*
 !modelV/backend/generated/.gitkeep
-backend/generated/
+backend/generated/*
+!backend/generated/.gitkeep
 
 # Local user accounts (demo auth store)
 backend/users.json
+
+# Runtime data (generated on first run)
+backend/song_history.json
+backend/kiai_callbacks.json
