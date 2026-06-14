@@ -152,7 +152,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="Echo Echo", version="2.0.0", lifespan=lifespan)
+app = FastAPI(title="Echo Echo", version="2.0.0", lifespan=lifespan, docs_url="/api/docs", redoc_url="/api/redoc")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -927,6 +927,14 @@ def get_audio(song_id: str) -> FileResponse:
     if not path.exists():
         raise HTTPException(status_code=404, detail="Audio file not found.")
     return FileResponse(path, media_type="audio/wav", filename=path.name)
+
+
+@app.get("/docs", include_in_schema=False)
+def docs_page() -> FileResponse:
+    path = FRONTEND_DIR / "docs.html"
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Docs page not found.")
+    return FileResponse(path, media_type="text/html")
 
 
 @app.get("/")
