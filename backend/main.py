@@ -24,6 +24,7 @@ from .api_generator import (
     KieAIConfigError,
     KieAIResponseError,
     generate_song as generate_api_song,
+    generate_vocal_song,
     get_callback_path,
     get_default_trim_duration_seconds,
     trim_audio,
@@ -128,6 +129,17 @@ class ComposeRequest(BaseModel):
     tempoFeel: str = ""
     bpm: int = Field(default=90, ge=40, le=220)
     prompt: str = ""
+
+
+class KieVocalRequest(BaseModel):
+    mood: str = "Energetic"
+    genre: str = "Pop"
+    theme: str = ""
+    instrument: str = ""
+    style: str = ""
+    tempoFeel: str = ""
+    bpm: int = Field(default=90, ge=40, le=220)
+    promptText: str = ""
 
 
 class TrimRequest(BaseModel):
@@ -785,6 +797,61 @@ def api_ace_step_lyrics(request: AceStepLyricsRequest) -> dict[str, Any]:
     )
     lyrics = completion.choices[0].message.content.strip()
     return {"ok": True, "lyrics": lyrics}
+
+
+@app.post("/api/kie-vocal")
+async def kie_vocal_generate(request: KieVocalRequest) -> dict[str, Any]:
+    """Generate a full vocal singing track via Kie.ai → Suno (instrumental=False)."""
+    reset_generation_status(180)
+    update_generation_status("Submitting vocal request to Kie.ai", 8)
+    try:
+        history = read_history()
+        existing_ids = {record_code(item) for item in history}
+
+        style = request.style or request.genre or "Pop"
+        instruments = [request.instrument] if request.instrument else []
+        theme = request.theme or request.promptText or "life"
+
+        data = ApiGenerationInput(
+            mood=request.mood or "Energetic",
+            theme=theme,
+            style=style,
+            instruments=instruments,
+            tempo=request.bpm,
+            energy=7,
+        )
+
+        update_generation_status("Generating vocal song — this takes 1–3 minutes", 15)
+        generated = await generate_vocal_song(
+            data,
+            generated_dir=GENERATED_DIR,
+            existing_ids=existing_ids,
+            extra_prompt=request.promptText,
+        )
+
+        filename = generated.get("original_audio_filename")
+        generated["mode"] = "kie-vocal"
+        generated["filename"] = filename
+        generated["audio_filename"] = filename
+        generated["audio_url"] = f"/generated/{filename}" if filename else None
+        generated["genre"] = request.genre
+        generated["mood_tag"] = request.mood
+        generated["bpm"] = request.bpm
+
+        append_history(generated)
+        update_generation_status("Done", 100)
+        return {"ok": True, "track": generated}
+
+    except KieAIConfigError as exc:
+        update_generation_status("Failed", 100)
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    except KieAIResponseError as exc:
+        update_generation_status("Failed", 100)
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    except Exception as exc:
+        update_generation_status("Failed", 100)
+        logger.exception("Vocal generation failed")
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 
 @app.post("/api/compose")

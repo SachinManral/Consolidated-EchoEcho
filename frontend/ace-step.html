@@ -650,6 +650,16 @@ let lastPromptTags = [];
   }
 })();
 
+/* ─── Pre-fill lyrics from Lyrics → Song page ─────────── */
+(function(){
+  const prefill = localStorage.getItem('ace_step_prefill_lyrics');
+  if(prefill){
+    const ta = document.getElementById('lyrics-input');
+    if(ta){ ta.value = prefill; }
+    localStorage.removeItem('ace_step_prefill_lyrics');
+  }
+})();
+
 /* ─── Multi-select chip toggle ─────────────────────────── */
 function toggle(el, group) {
   const val = el.dataset.val;

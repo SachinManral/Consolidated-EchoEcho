@@ -277,3 +277,102 @@ async def generate_song(
         total_elapsed,
     )
     return result
+
+
+async def submit_vocal_to_suno(
+    client: httpx.AsyncClient,
+    api_key: str,
+    data: GenerationInput,
+    extra_prompt: str = "",
+) -> str:
+    """Submit a vocal (non-instrumental) generation to Kie.ai/Suno."""
+    instrument_text = ", ".join(data.instruments) if data.instruments else ""
+    style_parts = [data.style, data.mood]
+    if instrument_text:
+        style_parts.append(instrument_text)
+    style = ", ".join(p for p in style_parts if p)
+
+    description = (
+        f"A {data.mood} {data.style} song"
+        f"{' about ' + data.theme if data.theme else ''}"
+        f"{'. ' + extra_prompt if extra_prompt else ''}."
+        f" {data.tempo} BPM, energy {data.energy}/10."
+        " Catchy melody, memorable chorus, clear singing vocals."
+    )
+
+    payload: dict[str, Any] = {
+        "prompt": description,
+        "customMode": False,
+        "instrumental": False,
+        "model": "V4",
+        "style": style or "pop, melodic, vocals",
+        "title": f"EchoEcho {data.mood} {data.theme or 'Song'}",
+        "negativeTags": "harsh noise, abrupt ending, spoken word",
+    }
+
+    # Attach callback URL only when PUBLIC_BASE_URL is configured
+    try:
+        payload["callBackUrl"] = build_callback_url()
+    except KieAIConfigError:
+        logger.info("No PUBLIC_BASE_URL set — submitting without callback URL")
+
+    response = await client.post(
+        KIE_GENERATE_URL,
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json=payload,
+        timeout=60,
+    )
+    body = sanitized_response_body(response)
+    if not response.is_success:
+        raise KieAIResponseError(
+            f"KieAI vocal generation failed with HTTP {response.status_code}."
+        )
+    if not isinstance(body, dict):
+        raise KieAIResponseError("KieAI returned an unexpected non-JSON response.")
+    if body.get("code") not in (None, 200):
+        raise KieAIResponseError(f"KieAI rejected the request: {body.get('msg') or 'Unknown error'}")
+    task_id = (body.get("data") or {}).get("taskId")
+    if not task_id:
+        raise KieAIResponseError("KieAI accepted the request but did not return a taskId.")
+    logger.info("KieAI vocal task submitted task_id=%s", task_id)
+    return task_id
+
+
+async def generate_vocal_song(
+    data: GenerationInput,
+    generated_dir: Path,
+    existing_ids: set[str],
+    extra_prompt: str = "",
+) -> dict[str, Any]:
+    """Generate a full vocal singing track via Kie.ai → Suno."""
+    api_key = os.getenv("KIEAI_API_KEY", "").strip()
+    if not api_key:
+        raise RuntimeError("KIEAI_API_KEY is missing. Add it to .env before generating songs.")
+
+    generated_dir.mkdir(parents=True, exist_ok=True)
+    code = generate_song_id(existing_ids)
+    original_audio_filename = f"ECHO_{code}_vocal.mp3"
+    original_file = generated_dir / original_audio_filename
+    total_started = time.perf_counter()
+
+    async with httpx.AsyncClient(follow_redirects=True) as client:
+        task_id = await submit_vocal_to_suno(client, api_key, data, extra_prompt)
+        record = await poll_suno(client, api_key, task_id)
+        audio_url = extract_audio_url(record)
+        if not audio_url:
+            raise RuntimeError("KieAI completed but did not provide an audio URL.")
+        await download_audio(client, audio_url, original_file)
+
+    logger.info(
+        "Vocal generation done code=%s task_id=%s file=%s total=%.2fs",
+        code, task_id, original_file, time.perf_counter() - total_started,
+    )
+    return {
+        "code": code,
+        "song_id": code,
+        "task_id": task_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        **asdict(data),
+        "original_audio_filename": original_audio_filename,
+        "trimmed_audio_filename": None,
+    }

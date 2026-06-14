@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Lyrics → Song</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @keyframes fade-up{0%{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse-ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.55);opacity:0}}
+    @keyframes rec-blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#fff;color:#0d0d0d}
+
+    :root{
+      --dark:#0d0d0d;
+      --white:#fff;
+      --greyF4:#f4f4f4;
+      --greyF5:#f5f5f5;
+      --greyD9:#d9d9d9;
+      --grey71:#717171;
+      --gradient:linear-gradient(0.351turn,#ff5858 23.71%,#c058ff 78.8%);
+      --gradient-text:linear-gradient(135deg,#ff5858 0%,#c058ff 100%);
+      --shadow-box:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+      --shadow-nav:0px 2px 5px rgba(0,0,0,.05),0px 8px 40px rgba(0,0,0,.04),0px 0px 2px rgba(0,0,0,.15);
+      --nav-h:64px;
+    }
+
+    /* ── NAV ───────────────────────────────────────────── */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:9999;
+      height:var(--nav-h);background:#fff;
+      border-bottom:1px solid rgba(13,13,13,.06);
+      display:flex;align-items:center;
+      padding:0 2rem;gap:1rem;
+    }
+    .nav-logo{display:flex;align-items:center;gap:.45rem;text-decoration:none}
+    .nav-logo-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .nav-wordmark{font-size:1rem;font-weight:800;letter-spacing:-.03em;color:var(--dark)}
+    .nav-wordmark em{font-style:normal;color:var(--dark)}
+    .nav-divider{width:1px;height:20px;background:rgba(13,13,13,.08);margin:0 .25rem}
+    .nav-page-title{font-size:.875rem;font-weight:600;color:var(--grey71)}
+    .nav-right{display:flex;align-items:center;gap:.75rem;margin-left:auto}
+    .nav-btn{
+      display:flex;align-items:center;gap:.45rem;
+      background:var(--greyF4);color:var(--dark);
+      font-weight:600;font-size:.875rem;
+      font-family:'Inter',sans-serif;
+      border-radius:9999px;padding:.55rem 1.125rem;
+      border:none;cursor:pointer;text-decoration:none;
+      transition:background .15s;
+    }
+    .nav-btn:hover{background:var(--greyD9)}
+
+    /* ── MAIN ─────────────────────────────────────────── */
+    .main{padding-top:calc(var(--nav-h) + 3rem);padding-bottom:6rem;min-height:100vh}
+    .container{max-width:760px;margin:0 auto;padding:0 1.5rem}
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .hero{text-align:center;margin-bottom:3rem;animation:fade-up .5s ease both}
+    .hero-icon{
+      width:64px;height:64px;border-radius:18px;background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;
+      margin:0 auto 1.25rem;font-size:1.75rem;
+    }
+    .hero-title{font-size:2rem;font-weight:800;letter-spacing:-.04em;color:var(--dark);margin-bottom:.5rem}
+    .hero-title span{background:var(--gradient-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .hero-sub{font-size:.95rem;color:var(--grey71);line-height:1.6;max-width:480px;margin:0 auto}
+
+    /* ── SECTION CARD ─────────────────────────────────── */
+    .section-card{
+      background:#fff;border-radius:20px;
+      border:1px solid rgba(13,13,13,.07);
+      box-shadow:var(--shadow-box);
+      padding:1.75rem;margin-bottom:1.25rem;
+      animation:fade-up .4s ease both;
+    }
+    .section-card:nth-child(1){animation-delay:0s}
+    .section-card:nth-child(2){animation-delay:.06s}
+    .section-card:nth-child(3){animation-delay:.12s}
+
+    .card-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem}
+    .card-step{
+      width:28px;height:28px;border-radius:50%;
+      background:var(--gradient);color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-size:.75rem;font-weight:700;flex-shrink:0;
+    }
+    .card-title{font-size:1.05rem;font-weight:700;color:var(--dark)}
+    .card-sub{font-size:.78rem;color:var(--grey71);margin-top:.1rem}
+
+    /* ── TEXTAREA ─────────────────────────────────────── */
+    .lyrics-textarea{
+      width:100%;min-height:200px;resize:vertical;
+      background:var(--greyF5);border:1.5px solid rgba(13,13,13,.08);
+      border-radius:14px;padding:1rem;
+      font-family:'Inter',sans-serif;font-size:.9rem;line-height:1.75;
+      color:var(--dark);outline:none;
+      transition:border-color .2s;
+    }
+    .lyrics-textarea:focus{border-color:rgba(192,88,255,.4)}
+
+    /* ── BUTTON ROW ───────────────────────────────────── */
+    .btn-row{display:flex;align-items:center;gap:.65rem;margin-top:.9rem;flex-wrap:wrap}
+
+    /* Record button */
+    .rec-btn{
+      display:inline-flex;align-items:center;gap:.5rem;
+      background:var(--greyF4);color:var(--dark);
+      border:1.5px solid transparent;
+      border-radius:9999px;padding:.55rem 1.1rem;
+      font-size:.85rem;font-weight:600;
+      font-family:'Inter',sans-serif;cursor:pointer;
+      transition:all .15s;
+    }
+    .rec-btn:hover{background:#ebebeb}
+    .rec-btn.recording{
+      background:rgba(255,88,88,.1);
+      border-color:rgba(255,88,88,.4);
+      color:#e03030;
+    }
+    .rec-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:#e03030;display:none;
+      animation:rec-blink .9s ease-in-out infinite;
+    }
+    .rec-btn.recording .rec-dot{display:block}
+
+    /* Clear button */
+    .clear-btn{
+      display:inline-flex;align-items:center;gap:.4rem;
+      background:none;color:var(--grey71);
+      border:1.5px solid rgba(13,13,13,.1);
+      border-radius:9999px;padding:.55rem 1rem;
+      font-size:.85rem;font-weight:600;
+      font-family:'Inter',sans-serif;cursor:pointer;
+      transition:all .15s;
+    }
+    .clear-btn:hover{border-color:rgba(255,88,88,.4);color:#e03030}
+
+    /* Status text */
+    .rec-status{
+      font-size:.78rem;font-weight:500;color:var(--grey71);
+      margin-left:.25rem;
+    }
+    .rec-status.listening{color:#e03030}
+
+    /* ── REFINE BUTTON ────────────────────────────────── */
+    .refine-btn{
+      display:inline-flex;align-items:center;justify-content:center;gap:.6rem;
+      background:var(--dark);color:#fff;
+      border:none;border-radius:9999px;
+      padding:.75rem 1.75rem;font-size:.95rem;font-weight:700;
+      font-family:'Inter',sans-serif;cursor:pointer;
+      position:relative;overflow:hidden;
+      transition:opacity .15s,transform .1s;
+    }
+    .refine-btn::before{
+      content:'';position:absolute;inset:0;
+      background:var(--gradient);opacity:0;
+      transition:opacity .2s;
+    }
+    .refine-btn span,.refine-btn svg{position:relative;z-index:1}
+    .refine-btn:hover::before{opacity:1}
+    .refine-btn:active{transform:scale(.97)}
+    .refine-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .refine-btn .btn-spinner{
+      width:16px;height:16px;
+      border:2.5px solid rgba(255,255,255,.3);
+      border-top-color:#fff;border-radius:50%;
+      animation:spin .7s linear infinite;
+      display:none;position:relative;z-index:1;
+    }
+    .refine-btn.loading .btn-label{display:none}
+    .refine-btn.loading .btn-spinner{display:block}
+
+    /* ── REFINED LYRICS BLOCK ─────────────────────────── */
+    .refined-pre{
+      width:100%;min-height:200px;
+      background:var(--greyF5);border:1.5px solid rgba(13,13,13,.08);
+      border-radius:14px;padding:1rem;
+      font-family:'Inter',sans-serif;font-size:.875rem;line-height:1.8;
+      color:var(--dark);white-space:pre-wrap;word-break:break-word;
+      margin-bottom:.75rem;
+    }
+    .refined-pre.editable{
+      outline:none;border-color:rgba(192,88,255,.4);
+      background:#fff;cursor:text;
+    }
+    .edit-toggle-btn{
+      display:inline-flex;align-items:center;gap:.4rem;
+      background:var(--greyF4);color:var(--dark);
+      border:none;border-radius:9999px;
+      padding:.4rem .85rem;font-size:.78rem;font-weight:600;
+      font-family:'Inter',sans-serif;cursor:pointer;
+      transition:background .15s;
+    }
+    .edit-toggle-btn:hover{background:#ebebeb}
+    .edit-toggle-btn.active{
+      background:linear-gradient(135deg,rgba(255,88,88,.1),rgba(192,88,255,.1));
+      color:#c058ff;
+    }
+
+    /* ── GENERATE CARD ────────────────────────────────── */
+    #generate-card{display:none}
+    .generate-btn{
+      display:flex;align-items:center;justify-content:center;gap:.65rem;
+      width:100%;
+      background:var(--dark);color:#fff;
+      border:none;border-radius:16px;
+      padding:1rem 2rem;font-size:1rem;font-weight:700;
+      font-family:'Inter',sans-serif;cursor:pointer;
+      position:relative;overflow:hidden;
+      transition:opacity .15s,transform .1s;
+    }
+    .generate-btn::before{
+      content:'';position:absolute;inset:0;
+      background:var(--gradient);opacity:0;
+      transition:opacity .2s;
+    }
+    .generate-btn span,.generate-btn svg{position:relative;z-index:1}
+    .generate-btn:hover::before{opacity:1}
+    .generate-btn:active{transform:scale(.98)}
+    .generate-note{
+      font-size:.75rem;color:var(--grey71);
+      text-align:center;margin-top:.65rem;line-height:1.5;
+    }
+
+    /* ── ERROR ────────────────────────────────────────── */
+    .error-box{
+      display:none;margin-top:1rem;
+      background:rgba(255,88,88,.07);
+      border:1px solid rgba(255,88,88,.25);
+      border-radius:14px;padding:.85rem 1.1rem;
+      font-size:.85rem;color:#c0392b;line-height:1.5;
+    }
+
+    /* ── UNSUPPORTED ──────────────────────────────────── */
+    .unsupported-msg{
+      display:none;
+      background:rgba(192,88,255,.06);
+      border:1px solid rgba(192,88,255,.2);
+      border-radius:12px;padding:.75rem 1rem;
+      font-size:.82rem;color:#8a3fc0;line-height:1.5;
+      margin-top:.75rem;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────────── */
+    @media(max-width:600px){
+      .nav{padding:0 1rem}
+      .main{padding-top:calc(var(--nav-h) + 1.5rem)}
+      .container{padding:0 1rem}
+      .section-card{padding:1.25rem}
+      .hero-title{font-size:1.5rem}
+      .btn-row{gap:.4rem}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════ NAV ══════ -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64">
+        <defs><clipPath id="lts-c"><rect width="64" height="64" rx="15"/></clipPath></defs>
+        <rect width="64" height="64" rx="15" fill="#ffffff"/>
+        <g clip-path="url(#lts-c)">
+          <path d="M55.5 54.1 A27 27 0 1 1 55.5 9.9" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <path d="M50.9 47.6 A19 19 0 1 1 50.9 16.4" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <path d="M46.9 41.8 A12 12 0 1 1 46.9 22.2" stroke="#0d0d0d" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+          <path d="M42.9 36.1 A5 5 0 1 1 42.9 27.9" stroke="#0d0d0d" stroke-width="4" stroke-linecap="round" fill="none"/>
+        </g>
+      </svg>
+    </div>
+    <span class="nav-wordmark">Echo <em>Echo</em></span>
+  </a>
+  <div class="nav-divider"></div>
+  <span class="nav-page-title">Lyrics → Song</span>
+
+  <div class="nav-right">
+    <a class="nav-btn" href="dashboard.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Dashboard
+    </a>
+  </div>
+</nav>
+
+<!-- ══════ MAIN ══════ -->
+<main class="main">
+  <div class="container">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-icon">✍️</div>
+      <h1 class="hero-title">Lyrics <span>→ Song</span></h1>
+      <p class="hero-sub">Type, paste or record your lyrics, refine them with Groq AI, then hand them straight to ACE-Step to sing.</p>
+    </div>
+
+    <!-- ── Section 1: Input ─────────────────────────────── -->
+    <div class="section-card">
+      <div class="card-header">
+        <div class="card-step">1</div>
+        <div>
+          <div class="card-title">Your Lyrics</div>
+          <div class="card-sub">Type, paste or record your lyrics below</div>
+        </div>
+      </div>
+
+      <textarea
+        id="lyrics-input-raw"
+        class="lyrics-textarea"
+        placeholder="Paste, type or record your lyrics here…"
+        spellcheck="true"
+      ></textarea>
+
+      <div class="btn-row">
+        <button class="rec-btn" id="rec-btn" onclick="toggleRecording()">
+          <span class="rec-dot"></span>
+          <span id="rec-btn-label">🎙 Record Voice</span>
+        </button>
+        <button class="clear-btn" onclick="clearInput()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          Clear
+        </button>
+        <span class="rec-status" id="rec-status">Ready</span>
+      </div>
+
+      <div class="unsupported-msg" id="unsupported-msg">
+        Voice recording is not supported in this browser — please type your lyrics instead.
+      </div>
+
+      <div class="error-box" id="input-error"></div>
+    </div>
+
+    <!-- ── Section 2: Refine ────────────────────────────── -->
+    <div class="section-card">
+      <div class="card-header">
+        <div class="card-step">2</div>
+        <div>
+          <div class="card-title">Refine with Groq</div>
+          <div class="card-sub">AI polishes your lyrics into [verse] / [chorus] format</div>
+        </div>
+      </div>
+
+      <button class="refine-btn" id="refine-btn" onclick="refineWithGroq()">
+        <span class="btn-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:.3rem"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+          Refine with Groq →
+        </span>
+        <div class="btn-spinner"></div>
+      </button>
+
+      <div class="error-box" id="refine-error"></div>
+
+      <!-- Refined output (hidden until success) -->
+      <div id="refined-output" style="display:none;margin-top:1.25rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+          <span style="font-size:.82rem;font-weight:600;color:var(--grey71)">Refined Lyrics</span>
+          <button class="edit-toggle-btn" id="edit-toggle" onclick="toggleEdit()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit
+          </button>
+        </div>
+        <div
+          id="refined-lyrics"
+          class="refined-pre"
+          role="textbox"
+          aria-multiline="true"
+        ></div>
+      </div>
+    </div>
+
+    <!-- ── Section 3: Generate ──────────────────────────── -->
+    <div class="section-card" id="generate-card">
+      <div class="card-header">
+        <div class="card-step">3</div>
+        <div>
+          <div class="card-title">Create Your Song</div>
+          <div class="card-sub">Send refined lyrics to ACE-Step and generate your track</div>
+        </div>
+      </div>
+
+      <button class="generate-btn" onclick="goToAceStep()">
+        <span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:.35rem"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Create Song with ACE-Step →
+        </span>
+      </button>
+      <p class="generate-note">This will open ACE-Step with your refined lyrics pre-filled</p>
+    </div>
+
+  </div><!-- /container -->
+</main>
+
+<script>
+/* ─── Auth guard ───────────────────────────────────────── */
+(function () {
+  if (!localStorage.getItem('echo_auth_token')) {
+    window.location.href = 'login.html';
+  }
+})();
+
+/* ─── State ────────────────────────────────────────────── */
+let isRecording = false;
+let recognition = null;
+let refinedLyricsText = '';
+let isEditable = false;
+
+/* ─── Web Speech API setup ─────────────────────────────── */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+  // Show unsupported message and disable record button
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('unsupported-msg').style.display = 'block';
+    const rb = document.getElementById('rec-btn');
+    rb.disabled = true;
+    rb.style.opacity = '.45';
+    rb.style.cursor = 'not-allowed';
+  });
+} else {
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  let finalTranscript = '';
+
+  recognition.onresult = function (event) {
+    let interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        finalTranscript += result[0].transcript + ' ';
+      } else {
+        interimTranscript += result[0].transcript;
+      }
+    }
+    // Update textarea: existing text + new final + current interim preview
+    const ta = document.getElementById('lyrics-input-raw');
+    const base = ta.dataset.baseText || '';
+    ta.value = base + finalTranscript + interimTranscript;
+  };
+
+  recognition.onend = function () {
+    // If still recording (e.g. auto-stopped), persist and restart
+    if (isRecording) {
+      const ta = document.getElementById('lyrics-input-raw');
+      ta.dataset.baseText = (ta.dataset.baseText || '') + finalTranscript;
+      finalTranscript = '';
+      try { recognition.start(); } catch (e) { /* already started */ }
+    }
+  };
+
+  recognition.onerror = function (event) {
+    if (event.error === 'no-speech') return; // benign
+    stopRecording();
+    showInputError('Voice error: ' + event.error + '. Please type your lyrics instead.');
+  };
+}
+
+/* ─── Toggle recording ─────────────────────────────────── */
+function toggleRecording() {
+  if (!SpeechRecognition) return;
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+function startRecording() {
+  isRecording = true;
+  const ta = document.getElementById('lyrics-input-raw');
+  // Save current textarea value as base for appending
+  ta.dataset.baseText = ta.value ? ta.value + '\n' : '';
+  try {
+    recognition.start();
+  } catch (e) { /* already started */ }
+  document.getElementById('rec-btn').classList.add('recording');
+  document.getElementById('rec-btn-label').textContent = '⏹ Stop Recording';
+  document.getElementById('rec-status').textContent = 'Listening…';
+  document.getElementById('rec-status').classList.add('listening');
+}
+
+function stopRecording() {
+  isRecording = false;
+  try { recognition.stop(); } catch (e) { /* already stopped */ }
+  document.getElementById('rec-btn').classList.remove('recording');
+  document.getElementById('rec-btn-label').textContent = '🎙 Record Voice';
+  document.getElementById('rec-status').textContent = 'Ready';
+  document.getElementById('rec-status').classList.remove('listening');
+  // Persist final transcript into textarea
+  const ta = document.getElementById('lyrics-input-raw');
+  ta.dataset.baseText = '';
+}
+
+/* ─── Clear input ──────────────────────────────────────── */
+function clearInput() {
+  if (isRecording) stopRecording();
+  const ta = document.getElementById('lyrics-input-raw');
+  ta.value = '';
+  ta.dataset.baseText = '';
+  hideInputError();
+}
+
+/* ─── Error helpers ────────────────────────────────────── */
+function showInputError(msg) {
+  const el = document.getElementById('input-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideInputError() {
+  document.getElementById('input-error').style.display = 'none';
+}
+function showRefineError(msg) {
+  const el = document.getElementById('refine-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideRefineError() {
+  document.getElementById('refine-error').style.display = 'none';
+}
+
+/* ─── Refine with Groq ─────────────────────────────────── */
+async function refineWithGroq() {
+  hideRefineError();
+  hideInputError();
+
+  const rawLyrics = document.getElementById('lyrics-input-raw').value.trim();
+  if (!rawLyrics) {
+    showInputError('Please type, paste or record some lyrics first.');
+    return;
+  }
+
+  const btn = document.getElementById('refine-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('echo_auth_token');
+    const res = await fetch('/api/ace-step/lyrics', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token,
+      },
+      body: JSON.stringify({
+        mood: 'Energetic',
+        genre: 'Pop',
+        theme: '',
+        instruments: [],
+        promptText: rawLyrics,
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.message || 'Refine request failed (' + res.status + ')');
+    }
+
+    const data = await res.json();
+    if (!data.ok || !data.lyrics) {
+      throw new Error('Unexpected response from server');
+    }
+
+    refinedLyricsText = data.lyrics;
+    showRefinedOutput(refinedLyricsText);
+    revealGenerateCard();
+  } catch (err) {
+    showRefineError('Could not refine lyrics: ' + err.message);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+/* ─── Show refined output ──────────────────────────────── */
+function showRefinedOutput(text) {
+  const el = document.getElementById('refined-lyrics');
+  el.textContent = text;
+  el.contentEditable = 'false';
+  el.classList.remove('editable');
+  isEditable = false;
+  document.getElementById('edit-toggle').classList.remove('active');
+  document.getElementById('edit-toggle').innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit';
+  document.getElementById('refined-output').style.display = 'block';
+}
+
+/* ─── Toggle edit mode ─────────────────────────────────── */
+function toggleEdit() {
+  const el = document.getElementById('refined-lyrics');
+  const btn = document.getElementById('edit-toggle');
+  isEditable = !isEditable;
+
+  if (isEditable) {
+    el.contentEditable = 'true';
+    el.classList.add('editable');
+    el.focus();
+    // Place cursor at end
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+    btn.classList.add('active');
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Done';
+  } else {
+    // Capture edits before going read-only
+    refinedLyricsText = el.innerText;
+    el.contentEditable = 'false';
+    el.classList.remove('editable');
+    btn.classList.remove('active');
+    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit';
+  }
+}
+
+/* ─── Reveal generate card ─────────────────────────────── */
+function revealGenerateCard() {
+  const card = document.getElementById('generate-card');
+  card.style.display = 'block';
+  setTimeout(function () {
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 150);
+}
+
+/* ─── Go to ACE-Step ───────────────────────────────────── */
+function goToAceStep() {
+  // If user edited the contenteditable, capture latest text
+  if (isEditable) {
+    refinedLyricsText = document.getElementById('refined-lyrics').innerText;
+  }
+  const lyrics = refinedLyricsText.trim();
+  if (!lyrics) {
+    showRefineError('Please refine your lyrics first before creating a song.');
+    return;
+  }
+  localStorage.setItem('ace_step_prefill_lyrics', lyrics);
+  window.location.href = 'ace-step.html';
+}
+</script>
+</body>
+</html>

@@ -71,6 +71,49 @@
     .create-btn:hover::before{transform:scaleX(1.031) scaleY(1.051)}
     .create-btn:active{transform:scale(.96)}
 
+    /* ── STUDIO DROPDOWN ──────────────────────────────── */
+    .studio-wrap{position:relative}
+    .studio-btn{
+      display:flex;align-items:center;gap:.4rem;
+      background:#f4f4f4;color:var(--dark);
+      font-weight:600;font-size:.875rem;font-family:'Inter',sans-serif;
+      border-radius:9999px;padding:.5rem 1rem;
+      border:none;cursor:pointer;transition:background .15s;
+    }
+    .studio-btn:hover{background:#e8e8e8}
+    .studio-chevron{transition:transform .18s;flex-shrink:0}
+    .studio-wrap.open .studio-chevron{transform:rotate(180deg)}
+
+    .studio-menu{
+      position:absolute;right:0;top:calc(100% + .625rem);
+      width:290px;background:#fff;
+      border-radius:18px;
+      box-shadow:0 4px 6px rgba(0,0,0,.05),0 20px 60px rgba(0,0,0,.12);
+      border:1px solid rgba(13,13,13,.06);
+      padding:.5rem;z-index:9999;
+      display:none;
+      animation:slide-down .18s cubic-bezier(.2,.75,.28,.9) both;
+    }
+    .studio-wrap.open .studio-menu{display:block}
+    .studio-menu-label{
+      font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--grey71);padding:.5rem .75rem .4rem;
+    }
+    .studio-item{
+      display:flex;align-items:center;gap:.75rem;
+      padding:.625rem .75rem;border-radius:12px;
+      cursor:pointer;transition:background .12s;
+      text-decoration:none;border:none;background:transparent;
+      width:100%;text-align:left;font-family:'Inter',sans-serif;
+    }
+    .studio-item:hover{background:#f4f4f4}
+    .studio-item-icon{
+      width:36px;height:36px;border-radius:10px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+    }
+    .studio-item-title{font-size:.875rem;font-weight:700;color:var(--dark);line-height:1.2}
+    .studio-item-sub{font-size:.72rem;color:var(--grey71);margin-top:.15rem;line-height:1.3}
+
     /* Profile avatar + dropdown */
     .profile-wrap{position:relative}
     .profile-avatar{
@@ -426,6 +469,28 @@
     }
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+    /* ── KIE VOCAL GENERATION OVERLAY ───────────────────── */
+    .gen-overlay{
+      position:fixed;inset:0;z-index:99998;
+      background:rgba(255,255,255,.96);backdrop-filter:blur(12px);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:1.5rem;opacity:0;pointer-events:none;
+      transition:opacity .3s;
+    }
+    .gen-overlay.open{opacity:1;pointer-events:auto}
+    .gen-stage{font-size:6rem;animation:frogDance var(--dur,.85s) ease-in-out infinite alternate}
+    .gen-title{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;color:var(--dark);text-align:center}
+    .gen-stage-label{font-size:.85rem;color:var(--grey71);text-align:center;max-width:320px;line-height:1.5}
+    .gen-bar-wrap{width:260px;height:6px;background:var(--greyF4);border-radius:3px;overflow:hidden}
+    .gen-bar{height:100%;background:var(--gradient);border-radius:3px;width:0%;transition:width .6s ease}
+    .gen-cancel{
+      margin-top:.5rem;font-size:.8rem;color:var(--grey71);
+      cursor:pointer;text-decoration:underline;text-underline-offset:3px;
+      background:none;border:none;font-family:'Inter',sans-serif;
+    }
+    .gen-cancel:hover{color:var(--dark)}
+    @keyframes frogDance{0%{transform:translateY(0) rotate(-4deg)}100%{transform:translateY(-12px) rotate(4deg)}}
+
     /* ── Responsive ─────────────────────────────────────── */
     @media(max-width:640px){
       .nav{padding:0 1rem}
@@ -661,14 +726,46 @@
   <span class="nav-page-title">Dashboard</span>
 
   <div class="nav-right">
-    <a class="create-btn" href="echo.html" style="text-decoration:none;background:var(--dark)">
-      <span>🎙</span>
-      <span>Echo Mode</span>
-    </a>
-    <a class="create-btn" href="ace-step.html" style="text-decoration:none;background:linear-gradient(135deg,#ff5858,#c058ff)">
-      <span>🎤</span>
-      <span>ACE-Step Vocals</span>
-    </a>
+    <!-- Studio dropdown -->
+    <div class="studio-wrap" id="studio-wrap">
+      <button class="studio-btn" id="studio-btn" onclick="toggleStudio(event)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span>Studio</span>
+        <svg class="studio-chevron" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="studio-menu" id="studio-menu">
+        <div class="studio-menu-label">Choose your tool</div>
+        <button class="studio-item" onclick="closeStudio();openCreateInspo()">
+          <div class="studio-item-icon" style="background:linear-gradient(135deg,#ff5858,#c058ff)">🎵</div>
+          <div>
+            <div class="studio-item-title">Kie.ai Vocal Song</div>
+            <div class="studio-item-sub">Full song with real AI vocals via Suno</div>
+          </div>
+        </button>
+        <a class="studio-item" href="ace-step.html" onclick="closeStudio()">
+          <div class="studio-item-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">🎤</div>
+          <div>
+            <div class="studio-item-title">ACE-Step Vocals</div>
+            <div class="studio-item-sub">Sing lyrics with HuggingFace ACE model</div>
+          </div>
+        </a>
+        <a class="studio-item" href="musicgen.html" onclick="closeStudio()">
+          <div class="studio-item-icon" style="background:linear-gradient(135deg,#059669,#10b981)">🎸</div>
+          <div>
+            <div class="studio-item-title">MusicGen Tone</div>
+            <div class="studio-item-sub">Pure instrumental music — no vocals</div>
+          </div>
+        </a>
+        <a class="studio-item" href="lyrics-to-song.html" onclick="closeStudio()">
+          <div class="studio-item-icon" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">🗣️</div>
+          <div>
+            <div class="studio-item-title">Lyrics → Song</div>
+            <div class="studio-item-sub">Speak or type lyrics → Groq refines → ACE sings</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
     <button class="create-btn" onclick="openCreateInspo()">
       <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
         <path d="M7 1V13M1 7H13" stroke="white" stroke-width="2" stroke-linecap="round"/>
@@ -844,6 +941,15 @@
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- ══════ KIE VOCAL GENERATION OVERLAY ══════ -->
+<div class="gen-overlay" id="gen-overlay">
+  <div class="gen-stage">🐸</div>
+  <div class="gen-title" id="gen-title">Writing your song…</div>
+  <div class="gen-stage-label" id="gen-label">Sending to Kie.ai — this usually takes 1–3 minutes</div>
+  <div class="gen-bar-wrap"><div class="gen-bar" id="gen-bar"></div></div>
+  <button class="gen-cancel" onclick="cancelVocalGen()">Cancel</button>
+</div>
 
 <!-- ══════ CREATE INSPO POPUP ══════ -->
 <div class="popup-overlay" id="popup-overlay">
@@ -1407,14 +1513,16 @@ function buildStepHTML(step){
 
   if(step.type === 'grid'){
     const cols = step.cols || 4;
+    const curr = sel[step.key] || [];
     html += `<div class="choice-grid${cols===5?' cols-5':''}">`;
     step.options.forEach(o => {
-      const active = sel[step.key] === o.l;
+      const active = Array.isArray(curr) ? curr.includes(o.l) : curr === o.l;
       html += `<div class="choice-chip${active?' sel':''}" data-key="${step.key}" data-val="${o.l}" onclick="selectChip(this)">
         <span class="chip-emoji">${o.e}</span>
         <span class="chip-label">${o.l}</span>
       </div>`;
     });
+    html += `<div style="width:100%;font-size:.7rem;color:var(--grey71);margin-top:.25rem;text-align:right">Select one or more</div>`;
     html += `</div>`;
 
   } else if(step.type === 'bpm'){
@@ -1478,9 +1586,15 @@ function renderPopupStep(idx, dir){
 function selectChip(el){
   const key = el.dataset.key;
   const val = el.dataset.val;
-  sel[key] = val;
-  el.closest('.choice-grid').querySelectorAll('.choice-chip').forEach(c => c.classList.remove('sel'));
-  el.classList.add('sel');
+  if(!Array.isArray(sel[key])) sel[key] = [];
+  const idx = sel[key].indexOf(val);
+  if(idx === -1){
+    sel[key].push(val);
+    el.classList.add('sel');
+  } else {
+    sel[key].splice(idx, 1);
+    el.classList.remove('sel');
+  }
 }
 
 function onBPMInput(input){
@@ -1551,22 +1665,142 @@ function prevStep(){
   }
 }
 
+/* ═══════════════════════════════════════════════
+   STUDIO DROPDOWN
+═══════════════════════════════════════════════ */
+function toggleStudio(e){
+  e.stopPropagation();
+  const wrap = document.getElementById('studio-wrap');
+  wrap.classList.toggle('open');
+  // close profile dropdown if open
+  document.getElementById('profile-dropdown').classList.remove('open');
+}
+function closeStudio(){
+  document.getElementById('studio-wrap').classList.remove('open');
+}
+document.addEventListener('click', function(e){
+  const wrap = document.getElementById('studio-wrap');
+  if(wrap && !wrap.contains(e.target)) wrap.classList.remove('open');
+});
+
+/* ═══════════════════════════════════════════════
+   KIE VOCAL GENERATION
+═══════════════════════════════════════════════ */
+let vocalGenAbort = null;
+
 function submitInspo(){
-  // Persist inspo data for generate page
-  const inspo = {
-    mood:       sel.mood       || 'Custom',
-    genre:      sel.genre      || 'Mixed',
-    theme:      sel.theme      || '',
-    instrument: sel.instrument || '',
-    style:      sel.style      || '',
+  closePopup();
+  setTimeout(() => startVocalGeneration(), 300);
+}
+
+function joinSel(key, fallback=''){
+  const v = sel[key];
+  if(!v) return fallback;
+  return Array.isArray(v) ? v.join(', ') : v;
+}
+
+async function startVocalGeneration(){
+  const payload = {
+    mood:       joinSel('mood',      'Energetic'),
+    genre:      joinSel('genre',     'Pop'),
+    theme:      joinSel('theme',     ''),
+    instrument: joinSel('instrument',''),
+    style:      joinSel('style',     ''),
     bpm:        sel.bpm        || 90,
-    tempoFeel:  sel.tempoFeel  || '',
+    tempoFeel:  joinSel('tempoFeel', ''),
     promptText: sel.promptText || '',
   };
-  localStorage.setItem('echo_pending_inspo', JSON.stringify(inspo));
-  closePopup();
-  // Brief delay so close animation plays before nav
-  setTimeout(() => { window.location.href = 'generate.html'; }, 280);
+
+  // Show overlay
+  document.getElementById('gen-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  setGenUI('Submitting to Kie.ai…', 5);
+
+  // Start polling status in background
+  let pollTimer = setInterval(async () => {
+    try {
+      const s = await fetch('/generation-status').then(r => r.json());
+      const pct = Math.min(95, s.progress || 0);
+      const label = s.stage || s.status || 'Generating vocal track…';
+      setGenUI(label, pct);
+    } catch(_){}
+  }, 3000);
+
+  vocalGenAbort = () => { clearInterval(pollTimer); };
+
+  try {
+    const res = await fetch('/api/kie-vocal', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+    });
+    clearInterval(pollTimer);
+
+    if(!res.ok){
+      const err = await res.json().catch(() => ({detail: 'Generation failed'}));
+      throw new Error(err.detail || 'Generation failed');
+    }
+
+    const data = await res.json();
+    if(!data.ok || !data.track) throw new Error('No track returned');
+
+    setGenUI('🎉 Song ready!', 100);
+
+    // Save track to localStorage library
+    const track = data.track;
+    const libraryTrack = {
+      id: track.song_id || track.code,
+      title: `${track.mood || ''} ${track.theme || track.genre || 'Song'}`.trim(),
+      mood: track.mood || payload.mood,
+      genre: track.genre || payload.genre,
+      bpm: track.bpm || payload.bpm,
+      mode: 'kie-vocal',
+      audio_url: track.audio_url || null,
+      created_at: track.created_at || new Date().toISOString(),
+    };
+    try {
+      const lib = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+      lib.unshift(libraryTrack);
+      localStorage.setItem('echo_tracks', JSON.stringify(lib));
+      tracks = lib;
+    } catch(_){}
+
+    await new Promise(r => setTimeout(r, 1200));
+    closeVocalGen();
+    renderView();
+    showToast('Vocal track added to library!');
+
+  } catch(err){
+    clearInterval(pollTimer);
+    setGenUI('Failed: ' + err.message, 0);
+    document.getElementById('gen-cancel').textContent = 'Close';
+    setTimeout(() => closeVocalGen(), 5000);
+  }
+}
+
+function setGenUI(label, pct){
+  const msgs = [
+    'Sending to Kie.ai…',
+    'Kie.ai is writing lyrics…',
+    'Suno is singing your song…',
+    'Mixing vocals and instruments…',
+    'Finalising your track…',
+    '🎶 Almost there…',
+  ];
+  const friendly = label.toLowerCase().includes('fail') ? label
+    : (msgs[Math.floor(pct / 17)] || label);
+  document.getElementById('gen-label').textContent = friendly;
+  document.getElementById('gen-bar').style.width = pct + '%';
+}
+
+function cancelVocalGen(){
+  if(vocalGenAbort) vocalGenAbort();
+  closeVocalGen();
+}
+
+function closeVocalGen(){
+  document.getElementById('gen-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 /* ═══════════════════════════════════════════════
