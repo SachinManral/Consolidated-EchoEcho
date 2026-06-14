@@ -7,6 +7,7 @@ import os
 import secrets
 import string
 import time
+import wave
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
@@ -385,6 +386,87 @@ def media_type_for(filename: str) -> str:
     return "audio/mpeg" if filename.lower().endswith(".mp3") else "audio/wav"
 
 
+def generated_url(filename: str) -> str:
+    return f"/generated/{Path(filename).name}"
+
+
+def generated_audio_path(filename: str) -> Path:
+    return GENERATED_DIR / Path(filename).name
+
+
+def audio_duration_seconds(path: Path, fallback_seconds: int | float | None = None) -> int:
+    try:
+        if path.suffix.lower() == ".wav":
+            with wave.open(str(path), "rb") as wav_file:
+                frame_rate = wav_file.getframerate()
+                if frame_rate > 0:
+                    return max(1, int(round(wav_file.getnframes() / frame_rate)))
+
+        from pydub import AudioSegment
+
+        audio = AudioSegment.from_file(path)
+        return max(1, int(round(len(audio) / 1000)))
+    except Exception as exc:
+        logger.warning("Could not read audio duration for %s: %s", path, exc)
+        if fallback_seconds:
+            return max(1, int(round(float(fallback_seconds))))
+        return 0
+
+
+def record_title(record: dict[str, Any]) -> str:
+    title = str(record.get("title") or "").strip()
+    if title:
+        return title
+    mood = str(record.get("mood") or "").strip()
+    theme = str(record.get("theme") or "").strip()
+    style = str(record.get("style") or record.get("genre") or "").strip()
+    parts = [part for part in (mood, theme or style) if part]
+    return " · ".join(parts) or "Generated Track"
+
+
+def finalize_generated_record(
+    record: dict[str, Any],
+    *,
+    fallback_duration: int | float | None = None,
+    title: str | None = None,
+    genre: str | None = None,
+    bpm: int | None = None,
+) -> dict[str, Any]:
+    filename = original_filename(record)
+    if not filename:
+        raise RuntimeError("Generated audio metadata did not include a filename.")
+
+    output_path = generated_audio_path(filename)
+    if not output_path.exists() or output_path.stat().st_size == 0:
+        raise RuntimeError(f"Generated audio file was not found on disk: {output_path}")
+
+    duration = audio_duration_seconds(output_path, fallback_duration)
+    audio_url = generated_url(filename)
+    relative_path = f"generated/{filename}"
+    song_id = record_code(record)
+
+    record.update(
+        {
+            "id": song_id or record.get("id"),
+            "title": title or record_title(record),
+            "genre": genre or record.get("genre") or record.get("style") or "",
+            "bpm": bpm or record.get("bpm") or record.get("tempo"),
+            "duration": duration,
+            "audio_path": relative_path,
+            "audio_url": audio_url,
+            "filename": filename,
+            "audio_filename": filename,
+            "original_audio_filename": record.get("original_audio_filename") or filename,
+            "output_file": relative_path,
+        }
+    )
+
+    logger.info("Generated file: %s", output_path)
+    logger.info("Audio URL: %s", audio_url)
+    logger.info("Duration: %s", duration)
+    return record
+
+
 def find_history_record(code: str) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
     normalized = code.upper()
     history = read_history()
@@ -400,18 +482,23 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     trimmed = trimmed_filename(record)
     source_url = record.get("audio_source_url") or None
 
-    local_original_exists = original and (GENERATED_DIR / original).exists()
-    original_url = f"/generated/{original}" if local_original_exists else source_url
+    local_original_exists = original and generated_audio_path(original).exists()
+    original_url = generated_url(original) if local_original_exists else source_url
 
-    local_trimmed_exists = trimmed and (GENERATED_DIR / trimmed).exists()
-    trimmed_url = f"/generated/{trimmed}" if local_trimmed_exists else None
+    local_trimmed_exists = trimmed and generated_audio_path(trimmed).exists()
+    trimmed_url = generated_url(trimmed) if local_trimmed_exists else None
 
     return {
         **record,
+        "id": record.get("id") or code,
+        "title": record_title(record),
+        "genre": record.get("genre") or record.get("style") or "",
+        "bpm": record.get("bpm") or record.get("tempo"),
         "code": code,
         "song_id": code,
         "filename": original,
         "audio_filename": original,
+        "audio_path": f"generated/{original}" if original else record.get("audio_path"),
         "audio_url": original_url,
         "original_audio_url": original_url,
         "original_download_url": f"/download/{code}/original" if code else None,
@@ -554,11 +641,16 @@ async def generate_with_api(request: GenerateRequest) -> dict[str, Any]:
         )
         generated["mode"] = "api"
         generated["fast"] = request.fast
-        generated["duration"] = request.duration
         filename = original_filename(generated)
         generated["filename"] = filename
         generated["audio_filename"] = filename
-        generated["audio_url"] = f"/generated/{filename}" if filename else None
+        finalize_generated_record(
+            generated,
+            fallback_duration=request.duration,
+            title=record_title(generated),
+            genre=generated.get("style") or request.style or first_or_join(request.genres, ""),
+            bpm=generated.get("tempo") or request.tempo,
+        )
         add_agent_sections(generated, request, str(generated.get("prompt") or ""))
         append_history(generated)
         update_generation_status("Completed", 100)
@@ -657,6 +749,13 @@ def generate_with_musicgen(request: GenerateRequest) -> dict[str, Any]:
         "audio_url": f"/generated/{filename}",
         "inference_seconds": round(float(generation_result.get("inference_seconds", 0)), 2),
     }
+    finalize_generated_record(
+        record,
+        fallback_duration=request.duration,
+        title=record_title(record),
+        genre=record.get("style") or first_or_join(request.genres, ""),
+        bpm=request.tempo,
+    )
     add_agent_sections(record, request, prompt)
     append_history(record)
     update_generation_status("Completed", 100)
@@ -667,8 +766,8 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
     reset_generation_status(600)
     update_generation_status("Generating lyrics for ACE-Step", 10)
     try:
-        song_id = create_song_id("mp3")
-        filename = f"ECHO_{song_id}_ace.mp3"
+        song_id = create_song_id("wav")
+        filename = f"ECHO_{song_id}_ace.wav"
         output_path = GENERATED_DIR / filename
 
         mood = first_or_join(request.moods or ([request.mood] if request.mood else []), "dreamy")
@@ -699,6 +798,11 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
             energy=request.energy,
             output_path=output_path,
         )
+        generated_path = Path(str(ace_result.get("audio_path") or output_path))
+        if generated_path.parent == GENERATED_DIR:
+            filename = generated_path.name
+        else:
+            filename = Path(filename).name
 
         update_generation_status("Checking copyright", 90)
         copyright_result = generate_copyright_section(lyrics_text, lyrics_ok)
@@ -725,6 +829,13 @@ async def generate_with_ace_step_mode(request: GenerateRequest) -> dict[str, Any
             "lyrics": lyrics_result,
             "copyright": copyright_result,
         }
+        finalize_generated_record(
+            record,
+            fallback_duration=request.duration or 30,
+            title=record_title(record),
+            genre=style,
+            bpm=request.tempo,
+        )
         append_history(record)
         update_generation_status("Completed", 100)
         return unified_response(record)
@@ -852,10 +963,16 @@ async def kie_vocal_generate(request: KieVocalRequest) -> dict[str, Any]:
         generated["mode"] = "kie-vocal"
         generated["filename"] = serve_file
         generated["audio_filename"] = serve_file
-        generated["audio_url"] = f"/generated/{serve_file}" if serve_file else None
         generated["genre"] = request.genre
         generated["mood_tag"] = request.mood
         generated["bpm"] = request.bpm
+        finalize_generated_record(
+            generated,
+            fallback_duration=60,
+            title=record_title(generated),
+            genre=request.genre or generated.get("style") or "",
+            bpm=request.bpm,
+        )
 
         append_history(generated)
         update_generation_status("Done", 100)

@@ -535,7 +535,7 @@
   const API_BASE = location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
 
   /* ── Generation mode (instrumental vs vocals) ───────── */
-  let selectedMode = localStorage.getItem('echo_gen_mode') || 'api';
+  let selectedMode = localStorage.getItem('echo_gen_mode') || 'musicgen';
   function setMode(mode) {
     selectedMode = mode;
     localStorage.setItem('echo_gen_mode', mode);
