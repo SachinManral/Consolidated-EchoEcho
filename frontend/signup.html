@@ -440,11 +440,13 @@
     setPersistence,
     browserLocalPersistence,
     createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
     signInWithPopup,
     signInWithRedirect,
     getRedirectResult,
     GoogleAuthProvider,
     OAuthProvider,
+    signOut,
     updateProfile
   } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
@@ -487,8 +489,8 @@
   function firebaseMessage(error) {
     const code = error && error.code ? error.code : '';
     const messages = {
-      'auth/account-exists-with-different-credential': 'An account already exists with this email. Try the original sign-in method.',
-      'auth/email-already-in-use': 'An account with this email already exists.',
+      'auth/account-exists-with-different-credential': 'We found a different sign-in method for this email. Try logging in, then connect this provider from your account.',
+      'auth/email-already-in-use': 'We could not create a fresh account for this email. Try logging in, or use another email address.',
       'auth/invalid-email': 'Please enter a valid email address.',
       'auth/invalid-credential': 'Invalid email or password.',
       'auth/operation-not-allowed': 'This sign-up method is not enabled for this Firebase project.',
@@ -552,7 +554,28 @@
     try {
       await authReady;
       const name = [firstName, lastName].filter(Boolean).join(' ');
-      const result = await createUserWithEmailAndPassword(auth, email, pw);
+      if (auth.currentUser && auth.currentUser.email && auth.currentUser.email.toLowerCase() === email.toLowerCase()) {
+        if (name && !auth.currentUser.displayName) await updateProfile(auth.currentUser, { displayName: name });
+        await finishFirebaseAuth(auth.currentUser, 'Account ready! Redirecting...');
+        return;
+      }
+      if (auth.currentUser && auth.currentUser.email && auth.currentUser.email.toLowerCase() !== email.toLowerCase()) {
+        await signOut(auth);
+      }
+      let result;
+      try {
+        result = await createUserWithEmailAndPassword(auth, email, pw);
+      } catch (err) {
+        if (err && ['auth/email-already-in-use', 'auth/account-exists-with-different-credential'].includes(err.code)) {
+          try {
+            result = await signInWithEmailAndPassword(auth, email, pw);
+          } catch (_) {
+            throw err;
+          }
+        } else {
+          throw err;
+        }
+      }
       if (name) await updateProfile(result.user, { displayName: name });
       await finishFirebaseAuth(result.user, 'Account created! Redirecting...');
     } catch (err) {
