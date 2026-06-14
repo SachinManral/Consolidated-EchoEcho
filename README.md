@@ -2,6 +2,8 @@
 
 A songwriting inspiration tool that generates short instrumental sketches, writes matching lyrics, and checks copyright safety — all from a mood, genre, and theme.
 
+📖 **[Full Documentation →](https://consolidated-echoecho.onrender.com/docs)**
+
 ## What It Does
 
 - **Generate music** via the Kie.AI API (30-second instrumental sketches powered by Suno)
@@ -113,6 +115,27 @@ Start command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
 | `POST` | `/api/library/{id}/trim` | Trim a song to 30s |
 | `GET` | `/generation-status` | Live generation progress |
 | `GET` | `/health` | Service health check |
+
+## Documentation
+
+Full documentation is available at **[consolidated-echoecho.onrender.com/docs](https://consolidated-echoecho.onrender.com/docs)**
+
+| Section | URL |
+|---|---|
+| Overview | `/docs` |
+| How It Works | `/docs/how-it-works` |
+| Tech Stack | `/docs/tech-stack` |
+| Getting Started | `/docs/getting-started` |
+| Environment Variables | `/docs/environment` |
+| Generate Music API | `/docs/api/generate` |
+| Compose Prompt API | `/docs/api/compose` |
+| Lyrics & Copyright API | `/docs/api/lyrics` |
+| Authentication API | `/docs/api/auth` |
+| Library API | `/docs/api/library` |
+| Download & Trim API | `/docs/api/download` |
+| Health & Status API | `/docs/api/health` |
+| Render Deployment | `/docs/deployment` |
+| Troubleshooting | `/docs/troubleshooting` |
 
 ## License
 
