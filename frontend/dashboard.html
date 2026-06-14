@@ -1142,7 +1142,9 @@ function normalizeTrack(t){
   renderView();
 
   // Sync backend history: server records are the source of truth for generated audio.
-  fetch('/history').then(r => r.ok ? r.json() : null).then(data => {
+  const authToken = localStorage.getItem('echo_auth_token');
+  const authFetchOptions = authToken ? {headers: {'Authorization': 'Bearer ' + authToken}} : {};
+  fetch('/history', authFetchOptions).then(r => r.ok ? r.json() : null).then(data => {
     const songs = Array.isArray(data) ? data : (data && Array.isArray(data.songs) ? data.songs : []);
     if(!songs.length) return;
     try {
@@ -1810,7 +1812,10 @@ async function startVocalGeneration(){
   try {
     const res = await fetch('/api/kie-vocal', {
       method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {
+        'Content-Type':'application/json',
+        ...(localStorage.getItem('echo_auth_token') ? {'Authorization':'Bearer ' + localStorage.getItem('echo_auth_token')} : {})
+      },
       body: JSON.stringify(payload),
     });
     clearInterval(pollTimer);

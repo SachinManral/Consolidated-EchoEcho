@@ -513,6 +513,8 @@
       const xhr = new XMLHttpRequest();
       const path = trackId ? '/song/' + encodeURIComponent(trackId) : '/history';
       xhr.open('GET', API_BASE + path, false);
+      const token = localStorage.getItem('echo_auth_token');
+      if (token) xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.send();
       if (xhr.status < 200 || xhr.status >= 300) return null;
       const body = JSON.parse(xhr.responseText || 'null');
