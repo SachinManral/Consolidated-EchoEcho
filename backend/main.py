@@ -101,10 +101,11 @@ class GenerateRequest(BaseModel):
     genres: list[str] = Field(default_factory=list)
     themes: list[str] = Field(default_factory=list)
     instruments: list[str] = Field(default_factory=list)
-    tempo: int = Field(default=90, ge=60, le=160)
+    tempo: int = Field(default=90, ge=20, le=300)
     complexity: Literal["Simple", "Moderate", "Rich"] = "Moderate"
     energy: int = Field(default=4, ge=1, le=10)
     custom_prompt: str = ""
+    lyrics: str = ""
 
 
 class LoginRequest(BaseModel):

@@ -11,3 +11,4 @@ pydub==0.25.1
 # and the deploy pins Python 3.12 where audioop is still in the stdlib.
 python-multipart==0.0.20
 gradio_client>=1.3.0
+groq>=0.8.0
