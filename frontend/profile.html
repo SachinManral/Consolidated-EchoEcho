@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Profile</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @keyframes fade-up{0%{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes toast-in{0%{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    @keyframes toast-out{0%{opacity:1;transform:translateX(-50%) translateY(0)}to{opacity:0;transform:translateX(-50%) translateY(12px)}}
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#fff;color:#0d0d0d}
+
+    :root{
+      --dark:#0d0d0d;
+      --white:#fff;
+      --greyF4:#f4f4f4;
+      --greyD9:#d9d9d9;
+      --grey71:#717171;
+      --gradient:linear-gradient(0.351turn,#ff5858 23.71%,#c058ff 78.8%);
+      --gradient-text:linear-gradient(135deg,#ff5858 0%,#c058ff 100%);
+      --shadow-box:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+      --nav-h:64px;
+    }
+
+    /* NAV */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:9999;
+      height:var(--nav-h);background:#fff;
+      border-bottom:1px solid rgba(13,13,13,.06);
+      display:flex;align-items:center;
+      padding:0 2rem;gap:1rem;
+    }
+    .nav-logo{display:flex;align-items:center;gap:.45rem;text-decoration:none}
+    .nav-logo-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    
+    .nav-wordmark{font-size:1rem;font-weight:800;letter-spacing:-.03em;color:var(--dark)}
+    .nav-wordmark em{font-style:normal;background:var(--gradient-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-divider{width:1px;height:20px;background:rgba(13,13,13,.08);margin:0 .25rem}
+    .nav-page-title{font-size:.875rem;font-weight:600;color:var(--grey71)}
+    .nav-back{
+      margin-left:auto;display:flex;align-items:center;gap:.45rem;
+      background:#f4f4f4;color:#0d0d0d;font-weight:600;font-size:.875rem;
+      font-family:'Inter',sans-serif;border-radius:9999px;padding:.55rem 1.125rem;
+      border:none;cursor:pointer;text-decoration:none;transition:background .15s;
+    }
+    .nav-back:hover{background:#e8e8e8}
+
+    /* LAYOUT */
+    .page{padding-top:calc(var(--nav-h) + 3rem);padding-bottom:4rem;padding-left:1.5rem;padding-right:1.5rem}
+    .inner{max-width:640px;margin:0 auto;animation:fade-up .5s ease both}
+
+    /* AVATAR HERO */
+    .avatar-section{display:flex;flex-direction:column;align-items:center;gap:.75rem;margin-bottom:2.5rem}
+    .avatar-circle{
+      width:80px;height:80px;border-radius:50%;
+      background:var(--gradient);
+      display:flex;align-items:center;justify-content:center;
+      font-size:2rem;font-weight:800;color:#fff;
+      flex-shrink:0;
+    }
+    .avatar-name{font-size:1.5rem;font-weight:800;letter-spacing:-.03em;color:#0d0d0d}
+    .avatar-email{font-size:.9rem;color:var(--grey71)}
+
+    /* CARDS */
+    .card{
+      background:#fff;border-radius:20px;
+      border:1px solid rgba(13,13,13,.07);
+      box-shadow:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+      padding:1.75rem;
+      margin-bottom:1.25rem;
+    }
+    .card-label{
+      font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--grey71);margin-bottom:1rem;
+    }
+
+    /* FORM FIELDS */
+    .field{margin-bottom:1rem}
+    .field label{display:block;font-size:.8rem;font-weight:600;color:#0d0d0d;margin-bottom:.4rem}
+    .field-row{display:flex;align-items:center;gap:.6rem}
+    .field input,.field textarea{
+      width:100%;background:#f4f4f4;border:1.5px solid transparent;
+      border-radius:12px;padding:.72rem 1rem;font-size:.9rem;
+      font-family:'Inter',sans-serif;color:#0d0d0d;
+      outline:none;transition:border-color .2s,background .2s;resize:none;
+    }
+    .field input:focus,.field textarea:focus{
+      border-color:rgba(192,88,255,.4);background:#fff;
+    }
+    .field input[readonly]{color:var(--grey71);cursor:not-allowed}
+    .field input[readonly]:focus{border-color:transparent;background:#f4f4f4}
+    .badge-readonly{
+      font-size:.7rem;font-weight:600;background:#f4f4f4;
+      border:1px solid rgba(13,13,13,.08);color:var(--grey71);
+      border-radius:6px;padding:.2rem .55rem;white-space:nowrap;flex-shrink:0;
+    }
+
+    /* STATS */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.875rem}
+    .stat-box{
+      background:#f4f4f4;border-radius:14px;padding:1rem;text-align:center;
+    }
+    .stat-value{font-size:1.75rem;font-weight:800;letter-spacing:-.04em;color:#0d0d0d;line-height:1}
+    .stat-key{font-size:.72rem;font-weight:600;color:var(--grey71);margin-top:.35rem}
+
+    /* DANGER ZONE */
+    .card-danger{
+      background:#fff;border-radius:20px;
+      border:1.5px solid rgba(255,88,88,.35);
+      box-shadow:0px 2.5px 6px rgba(255,88,88,.04),0px 10px 50px rgba(255,88,88,.03),0px 0px 2.5px rgba(255,88,88,.12);
+      padding:1.75rem;
+      margin-bottom:1.25rem;
+    }
+    .card-danger .card-label{color:#ff5858}
+    .danger-desc{font-size:.875rem;color:var(--grey71);margin-bottom:1.25rem;line-height:1.5}
+    .btn-danger{
+      background:#fff;color:#ff5858;border:1.5px solid rgba(255,88,88,.4);
+      border-radius:12px;padding:.72rem 1.25rem;font-size:.875rem;font-weight:700;
+      font-family:'Inter',sans-serif;cursor:pointer;transition:background .15s,border-color .2s;
+    }
+    .btn-danger:hover{background:rgba(255,88,88,.06);border-color:#ff5858}
+
+    /* SAVE BUTTON */
+    .save-row{display:flex;justify-content:flex-end;margin-top:.5rem}
+    .btn-save{
+      background:linear-gradient(135deg,#ff5858,#c058ff);color:#fff;
+      border:none;border-radius:12px;padding:.75rem 1.5rem;
+      font-size:.9rem;font-weight:700;font-family:'Inter',sans-serif;
+      cursor:pointer;transition:opacity .15s,transform .12s;
+    }
+    .btn-save:hover{opacity:.9}
+    .btn-save:active{transform:scale(.97)}
+
+    /* TOAST */
+    .toast{
+      position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+      background:#fff;border:1px solid rgba(13,13,13,.08);
+      box-shadow:0 8px 32px rgba(0,0,0,.12);
+      border-radius:12px;padding:.75rem 1.25rem;
+      font-size:.875rem;font-weight:600;color:#0d0d0d;
+      display:flex;align-items:center;gap:.5rem;
+      z-index:99999;pointer-events:none;
+      animation:toast-in .3s ease both;
+    }
+    .toast.hide{animation:toast-out .3s ease both}
+    .toast-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64"><defs><clipPath id="nl-c"><rect width="64" height="64" rx="15"/></clipPath></defs><rect width="64" height="64" rx="15" fill="#ffffff"/><g clip-path="url(#nl-c)"><path d="M55.5 54.1 A27 27 0 1 1 55.5 9.9" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M50.9 47.6 A19 19 0 1 1 50.9 16.4" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M46.9 41.8 A12 12 0 1 1 46.9 22.2" stroke="#0d0d0d" stroke-width="4.5" stroke-linecap="round" fill="none"/><path d="M42.9 36.1 A5 5 0 1 1 42.9 27.9" stroke="#0d0d0d" stroke-width="4" stroke-linecap="round" fill="none"/></g></svg></div>
+    <span class="nav-wordmark">Echo <em>Echo</em></span>
+  </a>
+  <div class="nav-divider"></div>
+  <span class="nav-page-title">Profile</span>
+  <a href="dashboard.html" class="nav-back">← Dashboard</a>
+</nav>
+
+<!-- MAIN -->
+<div class="page">
+  <div class="inner">
+
+    <!-- Avatar hero -->
+    <div class="avatar-section">
+      <div class="avatar-circle" id="avatarCircle">?</div>
+      <div class="avatar-name" id="heroName">Loading…</div>
+      <div class="avatar-email" id="heroEmail"></div>
+    </div>
+
+    <!-- Card 1: Personal Info -->
+    <div class="card">
+      <div class="card-label">Personal Info</div>
+
+      <div class="field">
+        <label for="fieldName">Full Name</label>
+        <input type="text" id="fieldName" placeholder="Your name" autocomplete="name"/>
+      </div>
+
+      <div class="field">
+        <label for="fieldEmail">Email</label>
+        <div class="field-row">
+          <input type="email" id="fieldEmail" placeholder="you@example.com" readonly/>
+          <span class="badge-readonly">Cannot change</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="fieldBio">Bio</label>
+        <textarea id="fieldBio" rows="3" placeholder="Tell us about your music taste…"></textarea>
+      </div>
+
+      <div class="save-row">
+        <button class="btn-save" onclick="saveProfile()">Save changes</button>
+      </div>
+    </div>
+
+    <!-- Card 2: Your Stats -->
+    <div class="card">
+      <div class="card-label">Your Stats</div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-value" id="statTracks">0</div>
+          <div class="stat-key">Tracks Created</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statDays">—</div>
+          <div class="stat-key">Days Active</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value" id="statGenre" style="font-size:1rem;padding-top:.35rem">—</div>
+          <div class="stat-key">Favorite Genre</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Danger Zone -->
+    <div class="card-danger">
+      <div class="card-label">Danger Zone</div>
+      <p class="danger-desc">Permanently delete your Echo Echo account and all associated data. This action cannot be undone.</p>
+      <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Auth guard
+  (function(){
+    if(!localStorage.getItem('echo_auth_token')){
+      window.location.href='login.html';
+    }
+  })();
+
+  // Populate fields
+  (function(){
+    const name  = localStorage.getItem('echo_user_name')  || '';
+    const email = localStorage.getItem('echo_user_email') || '';
+    const bio   = localStorage.getItem('echo_user_bio')   || '';
+
+    // Avatar
+    const initial = name.trim().charAt(0).toUpperCase() || '?';
+    document.getElementById('avatarCircle').textContent = initial;
+    document.getElementById('heroName').textContent     = name  || 'Your Name';
+    document.getElementById('heroEmail').textContent    = email || '';
+
+    // Fields
+    document.getElementById('fieldName').value  = name;
+    document.getElementById('fieldEmail').value = email;
+    document.getElementById('fieldBio').value   = bio;
+
+    // Stats
+    const tracks = JSON.parse(localStorage.getItem('echo_tracks') || '[]');
+    document.getElementById('statTracks').textContent = tracks.length;
+
+    const memberSince = localStorage.getItem('echo_member_since');
+    if(memberSince){
+      const days = Math.max(1, Math.floor((Date.now() - parseInt(memberSince)) / 86400000));
+      document.getElementById('statDays').textContent = days;
+    } else if(tracks.length > 0){
+      const sorted = tracks.filter(t => t.created_at).sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+      if(sorted.length > 0){
+        const days = Math.max(1, Math.floor((Date.now() - new Date(sorted[0].created_at)) / 86400000));
+        document.getElementById('statDays').textContent = days;
+      }
+    }
+  })();
+
+  function saveProfile(){
+    const name = document.getElementById('fieldName').value.trim();
+    const bio  = document.getElementById('fieldBio').value;
+
+    if(name){
+      localStorage.setItem('echo_user_name', name);
+      localStorage.setItem('echo_user_bio',  bio);
+      // Set member since if not already set
+      if(!localStorage.getItem('echo_member_since')){
+        localStorage.setItem('echo_member_since', Date.now().toString());
+      }
+      // Update hero
+      document.getElementById('heroName').textContent = name;
+      const initial = name.charAt(0).toUpperCase();
+      document.getElementById('avatarCircle').textContent = initial;
+    }
+    showToast('Profile updated!');
+  }
+
+  function deleteAccount(){
+    alert('This would delete your account — contact support@echo.app');
+  }
+
+  function showToast(msg){
+    // Remove existing toast
+    const old = document.getElementById('toast');
+    if(old) old.remove();
+
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.id = 'toast';
+    t.innerHTML = '<div class="toast-dot"></div>' + msg;
+    document.body.appendChild(t);
+
+    setTimeout(()=>{
+      t.classList.add('hide');
+      setTimeout(()=>t.remove(), 320);
+    }, 2500);
+  }
+</script>
+</body>
+</html>

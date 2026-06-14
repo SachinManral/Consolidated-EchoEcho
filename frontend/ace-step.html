@@ -41,11 +41,8 @@
       padding:0 2rem;gap:1rem;
     }
     .nav-logo{display:flex;align-items:center;gap:.45rem;text-decoration:none}
-    .nav-logo-icon{
-      width:32px;height:32px;border-radius:9px;background:var(--gradient);
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    }
-    .nav-logo-icon svg{width:16px;height:16px}
+    .nav-logo-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    
     .nav-wordmark{font-size:1rem;font-weight:800;letter-spacing:-.03em;color:var(--dark)}
     .nav-wordmark em{font-style:normal;background:var(--gradient-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
     .nav-divider{width:1px;height:20px;background:rgba(13,13,13,.08);margin:0 .25rem}
@@ -260,16 +257,47 @@
     .action-btn.secondary{background:var(--greyF4);color:var(--dark)}
     .action-btn.secondary:hover{background:#ebebeb}
 
+    /* ── Frog loading mascot ────────────────────────── */
+    .frog-stage{--dur:0.85s;position:relative;width:12em;height:12em;font-size:13px;margin:0 auto .5rem}
+    .frog,.frog div,.guitar,.guitar div,.music-note{position:absolute}
+    .frog{left:50%;top:54%;width:7em;height:7em;transform:translate(-50%,-50%);animation:frogDance var(--dur) ease-in-out infinite;filter:drop-shadow(0 0.45em 0.8em rgba(13,13,13,.16)) drop-shadow(0 0 0.35em rgba(255,88,88,.1))}
+    .frog__body{left:1.8em;top:3em;width:3.4em;height:3.2em;background:#58c96f;border-radius:48% 52% 45% 45%;box-shadow:inset -0.35em -0.35em 0 #2f9f4f}
+    .frog__belly{left:.65em;top:.85em;width:2.1em;height:1.9em;background:#b9f3a4;border-radius:50%}
+    .frog__head{left:1.1em;top:.9em;width:4.8em;height:3.1em;background:#64d979;border-radius:48% 48% 45% 45%;box-shadow:inset -0.3em -0.25em 0 #36aa55;animation:frogHead var(--dur) ease-in-out infinite}
+    .frog__eye{top:-.45em;width:1.25em;height:1.25em;background:#eaffdc;border-radius:50%;border:.15em solid #49b85f}
+    .frog__eye--left{left:.65em}.frog__eye--right{right:.65em}
+    .frog__pupil{top:.02em;width:.42em;height:.42em;background:#11351d;border-radius:50%;animation:blink 3s infinite}
+    .frog__pupil--left{left:1.1em}.frog__pupil--right{right:1.1em}
+    .frog__smile{left:1.55em;top:1.6em;width:1.7em;height:.75em;border-bottom:.18em solid #174623;border-radius:0 0 2em 2em}
+    .frog__arm{top:3.45em;width:2.2em;height:.55em;background:#4fc768;border-radius:1em;transform-origin:.25em 50%;z-index:4}
+    .frog__arm--left{left:.9em;transform:rotate(28deg);animation:leftArm var(--dur) ease-in-out infinite}
+    .frog__arm--right{right:.55em;transform-origin:100% 50%;animation:strum var(--dur) ease-in-out infinite}
+    .frog__leg{top:5.7em;width:1.8em;height:.7em;background:#3fb85b;border-radius:1em;transform-origin:50% 50%}
+    .frog__leg--left{left:1.1em;animation:leftLeg var(--dur) ease-in-out infinite}
+    .frog__leg--right{right:1.1em;animation:rightLeg var(--dur) ease-in-out infinite}
+    .guitar{left:1.2em;top:2.8em;width:4.6em;height:2.9em;z-index:3;transform:rotate(-18deg);animation:guitarBounce var(--dur) ease-in-out infinite}
+    .guitar__body{left:.2em;top:.75em;width:2.4em;height:1.85em;background:linear-gradient(135deg,#ff5858,#c058ff);border-radius:50%;box-shadow:inset -0.25em -0.2em 0 rgba(13,13,13,.18)}
+    .guitar__hole{left:1.05em;top:1.25em;width:.65em;height:.65em;background:#0d0d0d;border-radius:50%}
+    .guitar__neck{left:2.25em;top:1.38em;width:2.25em;height:.28em;background:#0d0d0d;border-radius:.2em}
+    .guitar__head{right:-.05em;top:1.12em;width:.6em;height:.8em;background:#0d0d0d;border-radius:.15em}
+    .guitar__strings{left:1.25em;top:1.48em;width:3em;height:.12em;background:#fff;box-shadow:0 -0.22em 0 #fff,0 0.22em 0 #fff;animation:strings var(--dur) linear infinite}
+    .music-note{color:#c058ff;font-weight:900;opacity:0;animation:floatNote 1.4s ease-in-out infinite}
+    .note-1{left:1.4em;top:2.2em;color:#ff5858;animation-delay:0s}
+    .note-2{right:1.3em;top:1.5em;color:#c058ff;animation-delay:.25s}
+    .note-3{left:5.4em;top:.7em;color:#0d0d0d;animation-delay:.5s}
+    @keyframes frogDance{0%,100%{transform:translate(-50%,-50%) rotate(-4deg) translateY(0)}50%{transform:translate(-50%,-50%) rotate(4deg) translateY(-.45em)}}
+    @keyframes frogHead{0%,100%{transform:rotate(5deg)}50%{transform:rotate(-5deg)}}
+    @keyframes leftArm{0%,100%{transform:rotate(30deg)}50%{transform:rotate(8deg)}}
+    @keyframes strum{0%,100%{transform:rotate(-45deg)}50%{transform:rotate(-12deg)}}
+    @keyframes leftLeg{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-14deg)}}
+    @keyframes rightLeg{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(14deg)}}
+    @keyframes guitarBounce{0%,100%{transform:rotate(-18deg)}50%{transform:rotate(-12deg)}}
+    @keyframes strings{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.8)}}
+    @keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+    @keyframes floatNote{0%{opacity:0;transform:translateY(0) scale(.8)}35%{opacity:1}100%{opacity:0;transform:translateY(-2.2em) scale(1.15)}}
+
     /* ── WAVEFORM VISUAL ────────────────────────────── */
-    .wave-visual{
-      display:flex;align-items:center;justify-content:center;gap:3px;
-      height:48px;margin-bottom:.75rem;
-    }
-    .wave-bar{
-      width:3px;border-radius:2px;
-      background:var(--gradient);
-      animation:wave-bar .6s ease-in-out infinite alternate;
-    }
+    .wave-visual{display:none}
 
     /* ── ERROR ────────────────────────────────────────── */
     #error-box{
@@ -306,9 +334,7 @@
 <!-- ══════ NAV ══════ -->
 <nav class="nav">
   <a href="index.html" class="nav-logo">
-    <div class="nav-logo-icon">
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
-    </div>
+    <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64"><defs><clipPath id="nl-c"><rect width="64" height="64" rx="15"/></clipPath></defs><rect width="64" height="64" rx="15" fill="#ffffff"/><g clip-path="url(#nl-c)"><path d="M55.5 54.1 A27 27 0 1 1 55.5 9.9" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M50.9 47.6 A19 19 0 1 1 50.9 16.4" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M46.9 41.8 A12 12 0 1 1 46.9 22.2" stroke="#0d0d0d" stroke-width="4.5" stroke-linecap="round" fill="none"/><path d="M42.9 36.1 A5 5 0 1 1 42.9 27.9" stroke="#0d0d0d" stroke-width="4" stroke-linecap="round" fill="none"/></g></svg></div>
     <span class="nav-wordmark">Echo <em>Echo</em></span>
   </a>
   <div class="nav-divider"></div>
@@ -542,7 +568,29 @@
 
     <!-- Progress -->
     <div id="progress-section">
-      <div class="wave-visual" id="gen-wave"></div>
+      <div class="frog-stage">
+        <div class="frog">
+          <div class="frog__head">
+            <div class="frog__eye frog__eye--left"><div class="frog__pupil frog__pupil--left"></div></div>
+            <div class="frog__eye frog__eye--right"><div class="frog__pupil frog__pupil--right"></div></div>
+            <div class="frog__smile"></div>
+          </div>
+          <div class="frog__body"><div class="frog__belly"></div></div>
+          <div class="frog__arm frog__arm--left"></div>
+          <div class="frog__arm frog__arm--right"></div>
+          <div class="frog__leg frog__leg--left"></div>
+          <div class="frog__leg frog__leg--right"></div>
+          <div class="guitar">
+            <div class="guitar__body"><div class="guitar__hole"></div></div>
+            <div class="guitar__neck"></div>
+            <div class="guitar__head"></div>
+            <div class="guitar__strings"></div>
+          </div>
+        </div>
+        <div class="music-note note-1">♪</div>
+        <div class="music-note note-2">♫</div>
+        <div class="music-note note-3">♩</div>
+      </div>
       <div class="progress-title">Composing your track...</div>
       <div class="progress-sub" id="progress-sub">Connecting to ACE-Step model</div>
       <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>

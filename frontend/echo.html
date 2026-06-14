@@ -49,11 +49,8 @@
       display: flex; align-items: center; padding: 0 2rem; gap: 1rem;
     }
     .nav-logo { display: flex; align-items: center; gap: .45rem; text-decoration: none; }
-    .nav-logo-icon {
-      width: 32px; height: 32px; border-radius: 9px; background: var(--gradient);
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .nav-logo-icon svg { width: 16px; height: 16px; }
+    .nav-logo-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    
     .nav-wordmark { font-size: 1rem; font-weight: 800; letter-spacing: -.03em; color: var(--dark); }
     .nav-wordmark em {
       font-style: normal; background: var(--gradient-text);
@@ -208,9 +205,7 @@
 
 <nav class="nav">
   <a class="nav-logo" href="index.html">
-    <div class="nav-logo-icon">
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="44" r="7" fill="#fff"/><rect x="26.5" y="18" width="4" height="26" rx="2" fill="#fff"/><path d="M42 26a11 11 0 0 1 0 14" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M49 20a20 20 0 0 1 0 26" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".55"/></svg>
-    </div>
+    <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64"><defs><clipPath id="nl-c"><rect width="64" height="64" rx="15"/></clipPath></defs><rect width="64" height="64" rx="15" fill="#ffffff"/><g clip-path="url(#nl-c)"><path d="M55.5 54.1 A27 27 0 1 1 55.5 9.9" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M50.9 47.6 A19 19 0 1 1 50.9 16.4" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M46.9 41.8 A12 12 0 1 1 46.9 22.2" stroke="#0d0d0d" stroke-width="4.5" stroke-linecap="round" fill="none"/><path d="M42.9 36.1 A5 5 0 1 1 42.9 27.9" stroke="#0d0d0d" stroke-width="4" stroke-linecap="round" fill="none"/></g></svg></div>
     <span class="nav-wordmark">Echo <em>Echo</em></span>
   </a>
   <div class="nav-divider"></div>

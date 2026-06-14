@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <title>Echo Echo — Help &amp; Support</title>
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    @keyframes fade-up{0%{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#fff;color:#0d0d0d}
+
+    :root{
+      --dark:#0d0d0d;
+      --white:#fff;
+      --greyF4:#f4f4f4;
+      --greyD9:#d9d9d9;
+      --grey71:#717171;
+      --gradient:linear-gradient(0.351turn,#ff5858 23.71%,#c058ff 78.8%);
+      --gradient-text:linear-gradient(135deg,#ff5858 0%,#c058ff 100%);
+      --shadow-box:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+      --nav-h:64px;
+    }
+
+    /* NAV */
+    .nav{
+      position:fixed;top:0;left:0;right:0;z-index:9999;
+      height:var(--nav-h);background:#fff;
+      border-bottom:1px solid rgba(13,13,13,.06);
+      display:flex;align-items:center;
+      padding:0 2rem;gap:1rem;
+    }
+    .nav-logo{display:flex;align-items:center;gap:.45rem;text-decoration:none}
+    .nav-logo-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    
+    .nav-wordmark{font-size:1rem;font-weight:800;letter-spacing:-.03em;color:var(--dark)}
+    .nav-wordmark em{font-style:normal;background:var(--gradient-text);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-divider{width:1px;height:20px;background:rgba(13,13,13,.08);margin:0 .25rem}
+    .nav-page-title{font-size:.875rem;font-weight:600;color:var(--grey71)}
+    .nav-back{
+      margin-left:auto;display:flex;align-items:center;gap:.45rem;
+      background:#f4f4f4;color:#0d0d0d;font-weight:600;font-size:.875rem;
+      font-family:'Inter',sans-serif;border-radius:9999px;padding:.55rem 1.125rem;
+      border:none;cursor:pointer;text-decoration:none;transition:background .15s;
+    }
+    .nav-back:hover{background:#e8e8e8}
+
+    /* LAYOUT */
+    .page{padding-top:calc(var(--nav-h) + 3rem);padding-bottom:4rem;padding-left:1.5rem;padding-right:1.5rem}
+    .inner{max-width:760px;margin:0 auto;animation:fade-up .5s ease both}
+
+    /* HERO */
+    .hero{text-align:center;margin-bottom:2.75rem}
+    .hero-heading{
+      font-size:2.5rem;font-weight:800;letter-spacing:-.04em;line-height:1.1;
+      color:#0d0d0d;margin-bottom:.75rem;
+    }
+    .hero-heading .grad{
+      background:var(--gradient-text);
+      -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    }
+    .hero-sub{font-size:1rem;color:var(--grey71);line-height:1.5}
+
+    /* CARDS */
+    .card{
+      background:#fff;border-radius:20px;
+      border:1px solid rgba(13,13,13,.07);
+      box-shadow:0px 2.5px 6px rgba(0,0,0,.05),0px 10px 50px rgba(0,0,0,.04),0px 0px 2.5px rgba(0,0,0,.15);
+      padding:1.75rem;
+      margin-bottom:1.25rem;
+    }
+    .card-label{
+      font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--grey71);margin-bottom:1rem;
+    }
+
+    /* ACCORDION */
+    .accordion-item{border-bottom:1px solid rgba(13,13,13,.06)}
+    .accordion-item:last-child{border-bottom:none}
+    .accordion-trigger{
+      width:100%;background:none;border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;
+      padding:.9rem 0;text-align:left;
+      font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;color:#0d0d0d;
+      transition:color .15s;
+    }
+    .accordion-trigger:hover{color:#c058ff}
+    .accordion-icon{
+      flex-shrink:0;width:20px;height:20px;border-radius:50%;
+      background:#f4f4f4;display:flex;align-items:center;justify-content:center;
+      font-size:.7rem;transition:background .2s,transform .25s;color:var(--grey71);
+    }
+    .accordion-item.open .accordion-icon{
+      background:linear-gradient(135deg,#ff5858,#c058ff);color:#fff;transform:rotate(180deg);
+    }
+    .accordion-body{
+      max-height:0;overflow:hidden;
+      transition:max-height .3s ease, padding .3s ease;
+    }
+    .accordion-body-inner{
+      font-size:.875rem;color:var(--grey71);line-height:1.65;
+      padding-bottom:1rem;
+    }
+    .accordion-item.open .accordion-body{max-height:200px}
+
+    /* CONTACT BUTTONS */
+    .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.875rem;margin-top:.25rem}
+    .contact-btn{
+      display:flex;align-items:center;justify-content:center;gap:.5rem;
+      border-radius:14px;padding:.9rem 1rem;
+      font-size:.875rem;font-weight:700;font-family:'Inter',sans-serif;
+      text-decoration:none;cursor:pointer;border:none;
+      transition:opacity .15s,transform .12s;
+    }
+    .contact-btn:active{transform:scale(.97)}
+    .contact-btn-primary{
+      background:linear-gradient(135deg,#ff5858,#c058ff);color:#fff;
+    }
+    .contact-btn-primary:hover{opacity:.9}
+    .contact-btn-outline{
+      background:#f4f4f4;color:#0d0d0d;border:1.5px solid rgba(13,13,13,.08);
+    }
+    .contact-btn-outline:hover{background:#ececec}
+    .contact-btn-outline.coming{color:var(--grey71);cursor:default}
+    .contact-btn-outline.coming:hover{background:#f4f4f4}
+    .badge-soon{
+      font-size:.6rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+      background:rgba(13,13,13,.06);border-radius:5px;padding:.15rem .4rem;color:var(--grey71);
+    }
+
+    /* SHORTCUTS TABLE */
+    .shortcuts-table{width:100%;border-collapse:collapse;margin-top:.25rem}
+    .shortcuts-table th{
+      font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+      color:var(--grey71);padding:.5rem .75rem;text-align:left;
+      border-bottom:1px solid rgba(13,13,13,.07);
+    }
+    .shortcuts-table td{
+      padding:.75rem .75rem;font-size:.875rem;border-bottom:1px solid rgba(13,13,13,.05);
+      vertical-align:middle;
+    }
+    .shortcuts-table tr:last-child td{border-bottom:none}
+    .kbd{
+      display:inline-flex;align-items:center;justify-content:center;
+      min-width:28px;height:26px;padding:0 .55rem;
+      background:#f4f4f4;border:1px solid rgba(13,13,13,.1);
+      border-radius:7px;font-size:.78rem;font-weight:700;
+      color:#0d0d0d;font-family:'Inter',monospace;
+      box-shadow:0 1px 0 rgba(0,0,0,.08);
+    }
+    .shortcut-desc{color:#0d0d0d;font-weight:500}
+    .shortcut-soon{color:var(--grey71);font-size:.8rem}
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 64 64"><defs><clipPath id="nl-c"><rect width="64" height="64" rx="15"/></clipPath></defs><rect width="64" height="64" rx="15" fill="#ffffff"/><g clip-path="url(#nl-c)"><path d="M55.5 54.1 A27 27 0 1 1 55.5 9.9" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M50.9 47.6 A19 19 0 1 1 50.9 16.4" stroke="#0d0d0d" stroke-width="5" stroke-linecap="round" fill="none"/><path d="M46.9 41.8 A12 12 0 1 1 46.9 22.2" stroke="#0d0d0d" stroke-width="4.5" stroke-linecap="round" fill="none"/><path d="M42.9 36.1 A5 5 0 1 1 42.9 27.9" stroke="#0d0d0d" stroke-width="4" stroke-linecap="round" fill="none"/></g></svg></div>
+    <span class="nav-wordmark">Echo <em>Echo</em></span>
+  </a>
+  <div class="nav-divider"></div>
+  <span class="nav-page-title">Help &amp; Support</span>
+  <a href="dashboard.html" class="nav-back">← Dashboard</a>
+</nav>
+
+<!-- MAIN -->
+<div class="page">
+  <div class="inner">
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1 class="hero-heading">How can we <span class="grad">help?</span></h1>
+      <p class="hero-sub">Find answers or reach out to our team</p>
+    </div>
+
+    <!-- Card 1: Quick answers (FAQ accordion) -->
+    <div class="card">
+      <div class="card-label">Quick answers</div>
+
+      <div class="accordion-item" id="faq-0">
+        <button class="accordion-trigger" onclick="toggleFaq(0)" aria-expanded="false">
+          <span>How do I generate a song?</span>
+          <div class="accordion-icon">&#8964;</div>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            Pick your mood, genre, BPM and energy on the dashboard. Click "Create Inspo" and your track generates in under 30 seconds.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item" id="faq-1">
+        <button class="accordion-trigger" onclick="toggleFaq(1)" aria-expanded="false">
+          <span>What is ACE-Step?</span>
+          <div class="accordion-icon">&#8964;</div>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            ACE-Step is an open-source AI model that generates songs with real sung vocals. Access it via the "ACE-Step Vocals" button in the dashboard.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item" id="faq-2">
+        <button class="accordion-trigger" onclick="toggleFaq(2)" aria-expanded="false">
+          <span>How do I get lyrics in my song?</span>
+          <div class="accordion-icon">&#8964;</div>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            On the ACE-Step page, click "Generate Lyrics with AI" — Groq writes [verse]/[chorus] lyrics based on your selections, then ACE-Step sings them.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item" id="faq-3">
+        <button class="accordion-trigger" onclick="toggleFaq(3)" aria-expanded="false">
+          <span>Can I download my tracks?</span>
+          <div class="accordion-icon">&#8964;</div>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            Yes! Every generated track has a "Download MP3" button in the result card.
+          </div>
+        </div>
+      </div>
+
+      <div class="accordion-item" id="faq-4">
+        <button class="accordion-trigger" onclick="toggleFaq(4)" aria-expanded="false">
+          <span>Is Echo Echo free?</span>
+          <div class="accordion-icon">&#8964;</div>
+        </button>
+        <div class="accordion-body">
+          <div class="accordion-body-inner">
+            Yes, the core features are free. ACE-Step uses HuggingFace's free tier — generation may take 60–120 seconds.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Card 2: Contact us -->
+    <div class="card">
+      <div class="card-label">Contact us</div>
+      <div class="contact-grid">
+        <a href="mailto:support@echo.app" class="contact-btn contact-btn-primary">
+          &#9993;&#xFE0E;&nbsp; Email us
+        </a>
+        <button class="contact-btn contact-btn-outline coming" disabled>
+          Discord &nbsp;<span class="badge-soon">Soon</span>
+        </button>
+        <a href="https://github.com/simplysandeepp/Consolidated-EchoEcho/issues" target="_blank" rel="noopener" class="contact-btn contact-btn-outline">
+          &#128027;&nbsp; GitHub Issues
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 3: Keyboard shortcuts -->
+    <div class="card">
+      <div class="card-label">Keyboard shortcuts</div>
+      <table class="shortcuts-table" aria-label="Keyboard shortcuts">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="kbd">Esc</span></td>
+            <td class="shortcut-desc">Close modal</td>
+          </tr>
+          <tr>
+            <td><span class="kbd">Enter</span></td>
+            <td class="shortcut-desc">Submit form</td>
+          </tr>
+          <tr>
+            <td><span class="kbd">Ctrl</span> + <span class="kbd">K</span></td>
+            <td class="shortcut-desc shortcut-soon">Coming soon</td>
+          </tr>
+          <tr>
+            <td><span class="kbd">?</span></td>
+            <td class="shortcut-desc shortcut-soon">Coming soon</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Auth guard
+  (function(){
+    if(!localStorage.getItem('echo_auth_token')){
+      window.location.href='login.html';
+    }
+  })();
+
+  function toggleFaq(index){
+    const item = document.getElementById('faq-' + index);
+    const isOpen = item.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.accordion-item.open').forEach(el => {
+      el.classList.remove('open');
+      el.querySelector('.accordion-trigger').setAttribute('aria-expanded','false');
+    });
+
+    // Open clicked (unless it was already open)
+    if(!isOpen){
+      item.classList.add('open');
+      item.querySelector('.accordion-trigger').setAttribute('aria-expanded','true');
+    }
+  }
+</script>
+</body>
+</html>
