@@ -295,25 +295,30 @@ def generate_song_id(existing_ids: set[str] | None = None) -> str:
 
 
 def library_song_summary(record: dict[str, Any], owner_email: str = "") -> dict[str, Any]:
-    song = with_urls(record)
+    song = song_detail_payload(record, owner_email=owner_email)
     return {
-        "songId": song.get("song_id"),
+        "songId": song.get("songId"),
         "song_id": song.get("song_id"),
         "id": song.get("id"),
         "ownerEmail": owner_email,
         "title": song.get("title"),
-        "provider": provider_label(str(song.get("mode") or "")),
+        "displayTitle": song.get("displayTitle"),
+        "provider": song.get("provider"),
         "mode": song.get("mode"),
-        "audioUrl": song.get("audio_url"),
+        "audioUrl": song.get("audioUrl"),
         "audio_url": song.get("audio_url"),
+        "downloadAudioUrl": song.get("downloadAudioUrl"),
         "duration": song.get("duration"),
-        "mood": song.get("mood") or song.get("mood_tag") or "",
-        "genre": song.get("genre") or song.get("style") or "",
-        "bpm": song.get("bpm") or song.get("tempo"),
+        "mood": song.get("mood"),
+        "genre": song.get("genre"),
+        "bpm": song.get("bpm"),
         "key": song.get("key"),
         "chords": song.get("chords") or [],
-        "musicSheet": (song.get("sheet") or {}).get("musicSheet") or [],
-        "lyrics": (song.get("sheet") or {}).get("lyrics"),
+        "musicSheet": song.get("musicSheet") or [],
+        "lyrics": song.get("lyrics"),
+        "lyricsAvailable": song.get("lyricsAvailable"),
+        "sheetAvailable": song.get("sheetAvailable"),
+        "lyricsSheetDownloadUrl": song.get("lyricsSheetDownloadUrl"),
         "createdAt": song.get("created_at"),
         "created_at": song.get("created_at"),
     }
@@ -335,7 +340,7 @@ def remember_user_song(user_email: str, user_name: str, record: dict[str, Any]) 
     song_ids = user_entry.setdefault("songIds", [])
     if song_id not in song_ids:
         song_ids.append(song_id)
-    songs[song_id] = library_song_summary(record, email)
+    songs[song_id] = song_detail_payload(record, owner_email=email)
     write_user_state(state)
 
 
@@ -622,6 +627,26 @@ def one_verse_lyrics(record: dict[str, Any]) -> dict[str, str] | None:
     return {"label": "Verse", "text": verse}
 
 
+def clean_short_verse(text: str) -> dict[str, str] | None:
+    record = {"lyrics": {"text": text, "structure": "real"}}
+    return one_verse_lyrics(record)
+
+
+def maybe_transcribe_lyrics(audio_path: Path, provider: str, vocals_enabled: bool) -> dict[str, str] | None:
+    if not vocals_enabled or not audio_path.exists():
+        return None
+    try:
+        content_type = "audio/mpeg" if audio_path.suffix.lower() == ".mp3" else "audio/wav"
+        text = transcribe_audio(audio_path.read_bytes(), audio_path.name, content_type)
+        lyrics = clean_short_verse(text)
+        if lyrics:
+            logger.info("Transcribed lyrics for %s using %s", audio_path.name, provider)
+        return lyrics
+    except Exception as exc:
+        logger.warning("Lyric transcription skipped for %s: %s", audio_path.name, exc)
+        return None
+
+
 def build_music_sheet_lines(record: dict[str, Any], chords: list[str]) -> list[str]:
     instruments = record.get("instruments") or []
     if isinstance(instruments, list):
@@ -806,34 +831,84 @@ def find_history_record(code: str, user_id: str = DEFAULT_USER_ID) -> tuple[list
     return history, None
 
 
+def state_user_entry(request: Request) -> tuple[str, str, dict[str, Any], dict[str, Any]]:
+    email = current_user_email(request).strip().lower()
+    name = current_user_name(request)
+    state = read_user_state()
+    user = state["users"].setdefault(email, {"name": name or email.split("@")[0], "email": email, "songIds": []})
+    user["name"] = name or user.get("name") or email.split("@")[0]
+    user["email"] = email
+    user.setdefault("songIds", [])
+    return email, name, state, user
+
+
+def migrate_history_to_state(request: Request) -> dict[str, Any]:
+    email, name, state, user = state_user_entry(request)
+    changed = False
+    for record in read_history(current_user_id(request)):
+        song_id = record_code(record)
+        if not song_id:
+            continue
+        if song_id not in user["songIds"]:
+            user["songIds"].append(song_id)
+            changed = True
+        existing_owner = str((state["songs"].get(song_id) or {}).get("ownerEmail") or "").strip().lower()
+        if song_id not in state["songs"] or existing_owner in {"", email}:
+            state["songs"][song_id] = song_detail_payload(record, owner_email=email)
+            changed = True
+    if changed:
+        write_user_state(state)
+    return state
+
+
+def state_song_for_user(song_id: str, request: Request) -> dict[str, Any] | None:
+    normalized = song_id.strip().upper()
+    email, _, state, user = state_user_entry(request)
+    if normalized not in set(str(item).upper() for item in user.get("songIds") or []):
+        return None
+    song = state["songs"].get(normalized)
+    if not isinstance(song, dict):
+        return None
+    owner = str(song.get("ownerEmail") or email).strip().lower()
+    if owner and owner != email:
+        return None
+    return song_detail_payload(song, owner_email=email)
+
+
 def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     attach_sheet(record)
     code = record_code(record)
     original = original_filename(record)
     trimmed = trimmed_filename(record)
     source_url = record.get("audio_source_url") or None
+    saved_audio_url = record.get("audio_url") or record.get("audioUrl") or None
 
     local_original_exists = original and generated_audio_path(original).exists()
-    original_url = generated_url(original) if original else source_url
+    original_url = generated_url(original) if local_original_exists else saved_audio_url or source_url
 
     local_trimmed_exists = trimmed and generated_audio_path(trimmed).exists()
     trimmed_url = generated_url(trimmed) if local_trimmed_exists else None
+    playable_url = trimmed_url or original_url
 
     return {
         **record,
         "id": record.get("id") or code,
         "title": record_title(record),
+        "displayTitle": record_title(record),
         "genre": record.get("genre") or record.get("style") or "",
         "bpm": record.get("bpm") or record.get("tempo"),
         "code": code,
         "song_id": code,
+        "songId": code,
         "filename": original,
         "audio_filename": original,
         "audio_path": f"generated/{original}" if original else record.get("audio_path"),
-        "audio_url": original_url,
+        "audio_url": playable_url,
+        "audioUrl": playable_url,
         "original_audio_url": original_url,
-        "original_download_url": f"/download/{code}/original" if code else None,
-        "download_url": f"/download/{code}/original" if code else None,
+        "original_download_url": f"/api/song/{code}/audio" if code and local_original_exists else None,
+        "download_url": f"/api/song/{code}/audio" if code and local_original_exists else None,
+        "downloadAudioUrl": f"/api/song/{code}/audio" if code and local_original_exists else None,
         "trimmed_audio_url": trimmed_url,
         "trimmed_download_url": f"/download/{code}/trimmed" if trimmed else None,
         "sheetAvailable": bool(record.get("sheetAvailable")),
@@ -842,23 +917,69 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def unified_response(record: dict[str, Any]) -> dict[str, Any]:
+def song_detail_payload(record: dict[str, Any], owner_email: str = "") -> dict[str, Any]:
     song = with_urls(record)
+    sheet = song.get("sheet") if isinstance(song.get("sheet"), dict) else {}
+    lyrics_sheet = sheet.get("lyrics") if isinstance(sheet.get("lyrics"), dict) else None
+    lyrics_text = str((lyrics_sheet or {}).get("text") or "").strip()
+    has_lyrics = bool(song.get("lyricsAvailable") and lyrics_text)
+    code = record_code(song)
+    return {
+        **song,
+        "songId": code,
+        "song_id": code,
+        "id": song.get("id") or code,
+        "ownerEmail": owner_email or song.get("ownerEmail") or "",
+        "displayTitle": song.get("displayTitle") or song.get("title") or (f"Song {code}" if code else "Generated Track"),
+        "provider": provider_label(str(song.get("mode") or "")),
+        "audioUrl": song.get("audioUrl") or song.get("audio_url") or "",
+        "audio_url": song.get("audio_url") or song.get("audioUrl") or "",
+        "downloadAudioUrl": song.get("downloadAudioUrl") or song.get("download_url"),
+        "duration": song.get("duration") or 0,
+        "mood": song.get("mood") or song.get("mood_tag") or "",
+        "genre": song.get("genre") or song.get("style") or "",
+        "bpm": song.get("bpm") or song.get("tempo") or 90,
+        "key": song.get("key") or sheet.get("key") or "",
+        "chords": sheet.get("chords") or song.get("chords") or [],
+        "musicSheet": sheet.get("musicSheet") or song.get("musicSheet") or [],
+        "lyrics": lyrics_sheet if has_lyrics else None,
+        "lyricsAvailable": has_lyrics,
+        "sheetAvailable": bool(song.get("sheetAvailable") and (sheet.get("musicSheet") or sheet.get("chords"))),
+        "lyricsSheetDownloadUrl": f"/api/song/{code}/lyrics-sheet" if code and has_lyrics else None,
+        "createdAt": song.get("created_at") or song.get("createdAt"),
+    }
+
+
+def unified_response(record: dict[str, Any]) -> dict[str, Any]:
+    song = song_detail_payload(record)
     return {
         "success": True,
         "ok": True,
         "mode": song.get("mode") or "musicgen",
+        "songId": song.get("songId"),
+        "displayTitle": song.get("displayTitle"),
+        "provider": song.get("provider"),
+        "audioUrl": song.get("audioUrl"),
         "audio_url": song.get("audio_url"),
         "filename": song.get("filename"),
         "song_id": song.get("song_id"),
+        "duration": song.get("duration"),
+        "mood": song.get("mood"),
+        "genre": song.get("genre"),
+        "bpm": song.get("bpm"),
+        "key": song.get("key"),
+        "chords": song.get("chords"),
+        "musicSheet": song.get("musicSheet"),
         "prompt_used": song.get("prompt"),
         "generation_time_seconds": song.get("generation_time_seconds"),
         "generation_time": song.get("generation_time"),
         "output_file": song.get("output_file") or (f"generated/{song['filename']}" if song.get("filename") else None),
         "download_filename": song.get("filename"),
+        "downloadAudioUrl": song.get("downloadAudioUrl"),
         "lyrics": song.get("lyrics"),
         "lyricsAvailable": bool(song.get("lyricsAvailable")),
         "sheetAvailable": bool(song.get("sheetAvailable")),
+        "lyricsSheetDownloadUrl": song.get("lyricsSheetDownloadUrl"),
         "sheet": song.get("sheet"),
         "copyright": song.get("copyright"),
         "song": song,
@@ -1137,12 +1258,13 @@ async def generate_with_ace_step_mode(
         if request.lyrics and request.lyrics.strip():
             update_generation_status("Using provided lyrics", 20)
             lyrics_text = request.lyrics.strip()
-            lyrics_result = {"text": lyrics_text, "structure": "user-provided"}
+            lyrics_result = clean_short_verse(lyrics_text) or {"text": lyrics_text, "structure": "user-provided"}
             lyrics_ok = True
         else:
             update_generation_status("Writing lyrics with AI", 20)
             lyrics_result, lyrics_ok = generate_lyrics_section(request, prompt_str)
             lyrics_text = lyrics_result.get("text", "")
+            lyrics_result = clean_short_verse(lyrics_text) or lyrics_result
 
         update_generation_status("Sending to ACE-Step (this may take a few minutes)", 35)
         ace_result = await asyncio.to_thread(generate_with_ace_step,
@@ -1257,11 +1379,13 @@ def api_firebase_config() -> dict[str, str]:
 class AceStepLyricsRequest(BaseModel):
     mood: str = ""
     genre: str = ""
+    theme: str = ""
     instruments: str = ""
     vocal: str = ""
     tempo: int = 90
     energy: int = 5
     prompt: str = ""
+    promptText: str = ""
 
 
 @app.post("/api/ace-step/lyrics")
@@ -1296,7 +1420,7 @@ def api_ace_step_lyrics(request: AceStepLyricsRequest) -> dict[str, Any]:
         f"Instruments: {request.instruments or 'piano, guitar'}\n"
         f"Vocal style: {request.vocal or 'smooth'}\n"
         f"Tempo: {request.tempo} BPM ({energy_desc} energy)\n"
-        f"Theme/prompt: {request.prompt or 'life and journey'}\n\n"
+        f"Theme/prompt: {request.prompt or request.promptText or request.theme or 'life and journey'}\n\n"
         "Make the lyrics singable, emotional, and original."
     )
 
@@ -1360,12 +1484,15 @@ async def kie_vocal_generate(request: KieVocalRequest, http_request: Request) ->
             bpm=request.bpm,
         )
         real_lyrics = one_verse_lyrics(generated)
+        if not real_lyrics and serve_file:
+            real_lyrics = maybe_transcribe_lyrics(GENERATED_DIR / serve_file, "kie-vocal", vocals_enabled=True)
+        generated["lyrics"] = real_lyrics
         generated["lyricsAvailable"] = bool(real_lyrics)
         attach_sheet(generated)
 
         save_user_song(user_id, generated, user_email=user_email, user_name=user_name)
         update_generation_status("Done", 100)
-        return {"ok": True, "track": with_urls(generated)}
+        return {"ok": True, "track": song_detail_payload(generated, owner_email=user_email)}
 
     except KieAIConfigError as exc:
         update_generation_status("Failed", 100)
@@ -1477,11 +1604,15 @@ def history(request: Request) -> dict[str, Any]:
 
 @app.get("/api/library")
 def api_library(request: Request) -> dict[str, Any]:
-    records = [with_urls(item) for item in read_history(current_user_id(request))]
-    songs = list(reversed(records))
-    email = current_user_email(request)
-    song_ids = [record_code(song) for song in songs if record_code(song)]
-    remember_user_profile(email, current_user_name(request), song_ids)
+    state = migrate_history_to_state(request)
+    email, _, _, user = state_user_entry(request)
+    song_ids = [str(song_id).upper() for song_id in user.get("songIds") or [] if str(song_id).strip()]
+    songs = [
+        song_detail_payload(state["songs"][song_id], owner_email=email)
+        for song_id in reversed(song_ids)
+        if isinstance(state["songs"].get(song_id), dict)
+        and str(state["songs"][song_id].get("ownerEmail") or email).strip().lower() == email
+    ]
     return {
         "ok": True,
         "user": {
@@ -1536,26 +1667,35 @@ def api_copyright_check(request: CopyrightCheckApiRequest, http_request: Request
 
 @app.get("/song/{song_id}")
 def song(song_id: str, request: Request) -> dict[str, Any]:
-    _, record = find_history_record(song_id, current_user_id(request))
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
     if record:
-        return {"song": with_urls(record)}
+        return {"song": record}
     raise HTTPException(status_code=404, detail="Song not found")
 
 
 @app.get("/api/song/{song_id}")
 def api_song(song_id: str, request: Request) -> dict[str, Any]:
-    _, record = find_history_record(song_id, current_user_id(request))
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
     if record:
-        return {"ok": True, "song": with_urls(record)}
+        return {"ok": True, "song": record}
     raise HTTPException(status_code=404, detail="Song not found")
 
 
 @app.get("/api/song/{song_id}/lyrics-sheet")
 def api_song_lyrics_sheet(song_id: str, request: Request) -> Response:
-    _, record = find_history_record(song_id, current_user_id(request))
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
     if not record:
         raise HTTPException(status_code=404, detail="Song not found")
-    song_record = with_urls(record)
+    song_record = song_detail_payload(record, owner_email=current_user_email(request))
     sheet = song_record.get("sheet") or {}
     lyrics = sheet.get("lyrics") if isinstance(sheet.get("lyrics"), dict) else None
     if not lyrics or not str(lyrics.get("text") or "").strip():
@@ -1581,6 +1721,23 @@ def api_song_lyrics_sheet(song_id: str, request: Request) -> Response:
         media_type="text/plain",
         headers={"Content-Disposition": f'attachment; filename="echoecho_{safe_title}_lyrics_sheet.txt"'},
     )
+
+
+@app.get("/api/song/{song_id}/audio")
+def api_song_audio(song_id: str, request: Request) -> FileResponse:
+    record = state_song_for_user(song_id, request)
+    if not record:
+        migrate_history_to_state(request)
+        record = state_song_for_user(song_id, request)
+    if not record:
+        raise HTTPException(status_code=404, detail="Song not found")
+    filename = original_filename(record)
+    if not filename:
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    path = GENERATED_DIR / filename
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="Audio file not found")
+    return FileResponse(path, media_type=media_type_for(filename), filename=filename)
 
 
 @app.post("/api/library/{code}/trim")

@@ -7,6 +7,8 @@ transformers
 torch
 soundfile
 gradio_client
+groq
+fpdf
 numpy
 scipy
 pytest==8.3.4
