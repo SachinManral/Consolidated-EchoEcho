@@ -1099,10 +1099,10 @@ def with_urls(record: dict[str, Any]) -> dict[str, Any]:
     )
 
     local_original_exists = bool(original and generated_audio_path(original).exists())
-    original_url = generated_url(original) if original else saved_audio_url or source_url
+    original_url = generated_url(original) if local_original_exists else (saved_audio_url or source_url)
 
     local_trimmed_exists = bool(trimmed and generated_audio_path(trimmed).exists())
-    trimmed_url = generated_url(trimmed) if trimmed else None
+    trimmed_url = generated_url(trimmed) if local_trimmed_exists else None
     playable_url = trimmed_url or original_url
 
     return {
@@ -1143,7 +1143,14 @@ def song_detail_payload(record: dict[str, Any], owner_email: str = "") -> dict[s
     song = with_urls(record)
     sheet = song.get("sheet") if isinstance(song.get("sheet"), dict) else {}
     lyrics_sheet = sheet.get("lyrics") if isinstance(sheet.get("lyrics"), dict) else None
-    lyrics_text = str((lyrics_sheet or {}).get("text") or "").strip()
+    # Prefer full lyrics stored on the record over the (possibly 1-verse) sheet excerpt
+    full_lyrics_obj = song.get("lyrics")
+    full_lyrics_text = str(
+        (full_lyrics_obj.get("text") if isinstance(full_lyrics_obj, dict) else full_lyrics_obj) or ""
+    ).strip()
+    sheet_lyrics_text = str((lyrics_sheet or {}).get("text") or "").strip()
+    lyrics_text = full_lyrics_text or sheet_lyrics_text
+    best_lyrics = full_lyrics_obj if full_lyrics_text else (lyrics_sheet if sheet_lyrics_text else None)
     has_lyrics = bool(song.get("lyricsAvailable") and lyrics_text)
     code = record_code(song)
     inline_music_sheet = persisted_music_sheet
@@ -1184,7 +1191,7 @@ def song_detail_payload(record: dict[str, Any], owner_email: str = "") -> dict[s
         "sheet_music_pdf_url": song.get("sheetMusicPdfUrl") or song.get("musicSheetPdfUrl") or "",
         "timeSignature": song.get("timeSignature") or sheet.get("timeSignature") or "4/4",
         "musicSheetLines": sheet.get("musicSheet") if isinstance(sheet.get("musicSheet"), list) else [],
-        "lyrics": lyrics_sheet if has_lyrics else None,
+        "lyrics": best_lyrics if has_lyrics else None,
         "lyricsAvailable": has_lyrics,
         "sheetAvailable": bool(song.get("sheetAvailable") and (sheet.get("musicSheet") or sheet.get("chords"))),
         "lyricsSheetDownloadUrl": f"/api/song/{code}/lyrics-sheet" if code and has_lyrics else None,
@@ -1516,13 +1523,14 @@ async def generate_with_ace_step_mode(
         if request.lyrics and request.lyrics.strip():
             update_generation_status("Using provided lyrics", 20)
             lyrics_text = request.lyrics.strip()
-            lyrics_result = clean_short_verse(lyrics_text) or {"text": lyrics_text, "structure": "user-provided"}
+            lyrics_result = {"label": "Lyrics", "text": lyrics_text, "structure": "user-provided"}
             lyrics_ok = True
         else:
             update_generation_status("Writing lyrics with AI", 20)
             lyrics_result, lyrics_ok = generate_lyrics_section(request, prompt_str)
             lyrics_text = lyrics_result.get("text", "")
-            lyrics_result = clean_short_verse(lyrics_text) or lyrics_result
+            # Store full lyrics; attach_sheet will extract a 1-verse summary separately
+            lyrics_result = {"label": "Lyrics", "text": lyrics_text} if lyrics_text else lyrics_result
 
         update_generation_status("Sending to ACE-Step (this may take a few minutes)", 35)
         ace_result = await asyncio.to_thread(generate_with_ace_step,

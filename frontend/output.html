@@ -510,8 +510,8 @@
               <span id="time-total">0:00</span>
             </div>
           </div>
-          <button class="vocals-toggle on" id="vocals-toggle" onclick="toggleVocals()">
-            <span class="mic-dot">🎤</span><span id="vocals-label">AI vocals on</span>
+          <button class="vocals-toggle" id="vocals-toggle" onclick="toggleVocals()">
+            <span class="mic-dot">🎤</span><span id="vocals-label">AI vocals off</span>
           </button>
         </div>
 
@@ -1329,7 +1329,7 @@
   let pausedElapsed = 0;     // seconds elapsed when paused
   let clockTimer = null;
   let currentLineIdx = -1;
-  let vocalsOn = true;
+  let vocalsOn = false;
   let chosenVoice = null;
 
   function pickVoice() {
